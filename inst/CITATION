@@ -1,0 +1,11 @@
+citHeader("To cite mlergm in publications, please use:")
+
+citEntry(entry = "manual",
+  author = "Jonathan Stewart and Michael Schweinberger", 
+  title = "{mlergm}: Multilevel Exponential-Family Random Graph Models",
+  year = "2018",
+  url = "https://CRAN.R-project.org/package=mlergm",
+  note = "R package version 0.1",
+  textVersion = "Stewart, J. and Schweinberger, M. (2018). mlergm: Multilevel Exponential-Family Random Graph Models. R package version 0.1, https://CRAN.R-project.org/package=mlergm."
+)
+

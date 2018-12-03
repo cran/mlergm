@@ -1,0 +1,298 @@
+---
+title: "Tutorial: mlergm"
+author: "Jonathan Stewart"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tutorial: mlergm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction 
+
+The R package `mlergm`, appropriately named
+"Multilevel Exponential-Family Random Graph Models," 
+aims to provide a convenient method for estimating exponential-family 
+random graph models (ERGMs) with multilevel structure. 
+Presently, 
+the beta release of the package supports estimation of ERGMs
+with non-overlapping block structure and local dependence
+(see the work of Schweinberger & Handcock (JRSS-B, 2015)),
+with plans to expand the coverage to overlapping block structure with local dependence
+and to structures with multiple levels and higher-order interactions in future updates. 
+
+
+The syntax of `mlergm` aims to mirror other network package interfaces, 
+namely that of the `ergm` framework, 
+to provide as small a learning curve as possible to users already acquainted with 
+the `ergm` and `network` package framework. 
+In the following sections, 
+we aim to highlight how to use `mlergm` and what features it posses. 
+
+Before we proceed into demonstrating how to use `mlergm` and all of the functionality 
+it has for multilevel networks analysis, 
+we first review some key ideas and terminology. 
+
+#### Brief background on multilevel networks 
+
+Multilevel networks come in many different forms, 
+and we point readers to the introductory chapter 
+written by Snijders in the monograph 
+"Multilevel network analysis for the social sciences: theory, methods and applications" 
+(Lazega & Snijders, Eds., 2016). 
+
+In the simplest form, 
+a multilevel network has a set of nodes $\mathcal{N}$ 
+(e.g., persons, brain regions, research articles) 
+partitioned into $K$ blocks  $\mathcal{A}_{1}, \ldots, \mathcal{A}_{K} \subseteq \mathcal{N}$ 
+(e.g., departments within a university, individual patient brains, 
+research journal), and a set of edges $\mathcal{E}$  which represent connections between nodes (e.g., advice seeking, functional connectivity, citation). 
+Network data are typically represented by an adjacency matrix $\boldsymbol{X}$,
+where in the case of a binary, undirected network, 
+$X_{i,j} = 1$ if $\{i,j\} \in \mathcal{E}$,
+and $X_{i,j} = 0$ otherwise. 
+The within-block subgraph are usually denoted by $\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_k}$ ($k = 1 , \ldots, K$)
+and the between-block subgraphare denoted by 
+$\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_l}$
+($1 \leq k < l \leq K$).
+
+In practice, researchers are usually interested in super-population inference, where the within-block network $\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_k}$ are assumed to have been generated from a distribution $\mathbb{P}_{\mathcal{A}_k, \, \boldsymbol{\theta}}$,
+and the goal is to estimate $\boldsymbol{\theta}$ in order to learn about mechanisms driving edge formation. 
+Past procedures have taken to estimating models for such network data
+by 
+
+1. Estimating an ERGM with no additional structure.
+2. Estimating individual ERGMs for each block subgraph.
+
+Both of these approaches fail to take into account the natural structure of the network. The first is unable to adaptively model differences in within- and between-block edge formations, while the second may overfit to the data by estimating separate parameters for each within-block subgraph, and does not use the additional structure to help estimate a general model. 
+
+
+This can be accomplished by estimating a model of the form
+$$
+\begin{aligned}
+\mathbb{P}_{\mathcal{N}, \, \boldsymbol{\theta}, \, \boldsymbol{\beta}}\left(\boldsymbol{X} = \boldsymbol{x}\right) \;\;&= \;\;  \prod_{k=1}^{K} \, \mathbb{P}_{\mathcal{A}_k, \, \boldsymbol{\theta}} \left( \boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_k} = \boldsymbol{x}_{\mathcal{A}_k, \, \mathcal{A}_k}\right)  \;  \prod_{l \neq k}^{K} \mathbb{P}_{\{\mathcal{A}_k, \, \mathcal{A}_l\}, \, \beta}\left(\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_l} = \boldsymbol{x}_{\mathcal{A}_k, \, \mathcal{A}_l}\right),
+\end{aligned}
+$$
+where 
+$$
+\begin{align}
+\mathbb{P}_{\{\mathcal{A}_k, \, \mathcal{A}_l\}, \, \boldsymbol{\beta}}\left(\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_l} = \boldsymbol{x}_{\mathcal{A}_k, \, \mathcal{A}_l}\right)
+\;\;&= \;\; \prod_{i \in \mathcal{A}_k} \; \prod_{j \in \mathcal{A}_l} \; \mathbb{P}_{\{i,\,j\}, \, \boldsymbol{\beta}}\left( X_{i,\,j} = x_{i,\,j}\right)
+\end{align} 
+$$
+
+The key model assumption is that the within-neighborood subgraphs $\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_k}$ ($k = 1, \ldots, K$) are mutually independent are that the between-block edges do not depend on the within-block edges. Dependence within the model is local in that it is restricted to blocks. Note as well that the $\boldsymbol{\theta}$ vector explicitly governs the within-block edges while the $\boldsymbol{\beta}$ vector governs the between-block edges, and the two are assumed to be variation independent. For more details on the model assumptions, see Schweinberger & Handcock (JRSS-B, 2015). 
+
+R package `mlergm` aims to provide an easy-to-use framework and interface for estimating models of the above form. In the coming sections, we will show how to use `mlergm` and will attempt to highlight key functionality that will help network scientists analyze such network data.
+
+
+## Getting started with `mlergm` 
+
+In order to get acquainted with `mlergm`, 
+let us consider a simple example: 
+a network with $K = 3$ blocks, each with $30$ unique nodes. 
+
+```{r, message = FALSE, eval = TRUE}
+# Load R package mlergm
+library(mlergm)
+
+# Networks can be created in the same was as other packages 
+net <- network.initialize(90, directed = FALSE)
+
+# The difference with mlergm is that we also have a block membership structure 
+node_memb <- c(rep(1, 30), rep(2, 30), rep(3, 30))
+```
+
+```{r, echo = FALSE, eval = TRUE}
+load("vig_data.rda")
+```
+
+A network (`net`) and a vector of block memberships (`node_memb`) is all we need to start working with `mlergm`. We note that `node_memb` does not need to be strictly numeric, as will be the case in later examples. 
+
+Currently, `net` is an empty graph, which is uninteresting. We will show how synethetic networks can be simulated from a specified mode using the `simulate_mlnet`. 
+
+```{r, fig.width = 4, fig.height = 3, out.width = "50%", dpi = 300, fig.align = "center", eval = FALSE}
+# Simulate a network from the edge + gwesp model 
+net <- simulate_mlnet(form = net ~ edges + gwesp, 
+                      node_memb = node_memb,
+                      seed = 123, 
+                      theta = c(-3, 1, .5))
+plot(net)
+```
+
+```{r, fig.width = 4, fig.height = 3, out.width = "50%", dpi = 300, fig.align = "center", eval = TRUE, echo = FALSE}
+plot(net)
+```
+
+The function `simulate_mlnet` returns a network which is both of class `mlnet` and `network`, and the `mlergm` package contains plotting methods for `mlnet` class networks, which allow for easy plotting of network data with block structure. 
+
+When actual data has been procured, the network data can be converted to an `mlnet` class using the `mlnet` function. 
+```{r, fig.width = 6, fig.height = 3, fig.align = "center", out.width = "80%", out.height = "30%", dpi = 300}
+# Let us use the sampson data set as an example 
+data(sampson)
+sampson_net <- mlnet(network = samplike, 
+                     node_memb = get.vertex.attribute(samplike, "group"))
+plot(sampson_net, arrow.size = 2.5, arrow.gap = 0.025)
+```
+
+The plotting functions of `mlergm` use the `GGally` package which extends the plotting capabilities of `ggplot2`. Specifically, the `mlnet` plotting method is a wrapper for the `ggnet2` function and can take most of the same plot parameters. 
+
+
+Estimation of specific models can be carried out via the `mlergm` function. 
+```{r, eval = FALSE}
+# Estimate the edge + gwesp model for the simulated network 
+model_est <- mlergm(net ~ edges + gwesp, verbose = 0, seed = 123)
+```
+
+We can then view the results by calling the `summary` function, which has a method for `mlergm` objects. 
+```{r, eval = TRUE, echo = TRUE}
+summary(model_est)
+```
+
+The `summary` function has a method for estimated objects of class `mlergm`, which has the following information: 
+
+1. The model formula estimated.
+2. Some basic summary information on the block structure.
+3. The Monte Carlo MLE estimates for each of the parameters. 
+4. Significance codes and p-values for each estimate, as well as estimates of the standard error. 
+5. BIC for the within-block model. 
+
+Note that when we simulated this network, we did not specify for between-block edges. As such, the output of the `summary` function also is telling us that the between block MLE does not exist. Presently, `mlergm` attempts to estimate an edge coefficient when the number of between block edges is not extreme. 
+
+We can evaluate goodness-of-fit of a fitted model of class `mlergm` by calling the `gof` method: 
+```{r, fig.width = 8, fig.height = 4.5, fig.align = "center", out.height = "70%", out.width = "90%", dpi = 300, eval = FALSE}
+# We can call the gof.mlergm method directly by calling 'gof' on an object of class 'mlergm'
+gof_res <- gof(model_est)
+plot(gof_res, cutoff = 15, pretty_x = TRUE)
+```
+
+```{r, fig.width = 8, fig.height = 4.5, fig.align = "center", out.height = "70%", out.width = "90%", dpi = 300, eval = TRUE, echo = FALSE}
+plot(gof_res, cutoff = 15, pretty_x = TRUE)
+```
+
+The goodness-of-fit function will be discussed in more depth later. But, for now it is worth noting that the plot method argument `cutoff` specifies the maximum range to plot for the boxplots, and the argument `pretty_x` is a logical argument which indicates whether the `pretty` function should be used to decide the x-axis breaks for the boxplot, which can be helpful when the range is large. 
+
+
+
+## Exploring the estimation function `mlergm`
+
+The function `mlergm` has a number of different options. 
+Firstly, the function is capable of doing two different parameterizations:
+
+1. 'standard': This parameterization option uses the parameter vector $\boldsymbol{\theta}$ without modification. 
+2. 'offset': When this parameterization is used, the parameter vector $\boldsymbol{\theta}$ will feature the size-dependent 
+   offsets of Krivitsky et. al (Statistical Methodology, 2011) for the edge term
+   and, if the network is directed, the size-dependent offset of 
+   Krivitsky & Kolaczyk (Satatistical Science, 2015) for the  mutual edge term as well:
+$$
+\begin{equation} 
+\eta_{k,\text{edge}}(\boldsymbol{\theta}) \;\;\;=\;\; \boldsymbol{\theta}_{\text{edge}}      \,\;\;\;\;-\;\;   \log \, |\mathcal{A}_k|
+\end{equation}
+$$
+$$
+\begin{equation} 
+\eta_{k, \text{mutual}}(\boldsymbol{\theta}) \;\;=\;\; \boldsymbol{\theta}_{\text{mutual}} \;\;+\;\;        \log \, |\mathcal{A}_k|,
+\end{equation} 
+$$
+where $\eta_{k,\text{edge}}(\boldsymbol{\theta})$ is the natural parameter for the edge term in block $k$
+and $\eta_{k, \text{mutual}}(\boldsymbol{\theta})$ is the natural parameter for the mutual term in block $k$.  
+
+This can be done by setting `parameterization == "offset"` in the `mlergm` call:
+```{r, eval = FALSE} 
+offset_est <- mlergm(sampson_net ~ edges + mutual, 
+                     seed = 123, 
+                     parameterization = "offset")
+```
+We can inspect the results, again, using the `summary` function. 
+```{r, eval = TRUE}
+summary(offset_est)
+```
+The `summary` output includes additional information when `parameterization == "offset"` notably including a reminder about the edge parameters. 
+
+The `mlergm` function can also take an initial parameter value through the argument `theta_init`,
+which can be useful when starting points are challenging to find or a procedure did not run to convergence. 
+Lastly, the argument `verbose` has three levels:
+
+1. `verbose = 0`: (default) no output is printed to the console. 
+2. `verbose = 1`: minimal output is printed to the console informing which steps of the procedure the estimation method is in. 
+3. `verbose = 2`: maximal output is printed to the console.
+
+
+## Options for estimation and simulation
+
+The `set_options` function is used in all code which involves estimation or simulation,
+which includes `mlergm`, `simulate_mlnet`, and the method `gof.mlergm`. 
+It is included as an argument `options = set_options()`. 
+A description of all possible functionality can be seen by using `help(set_options)`, 
+however, here we highlight a few key parameters.
+
+#### Simulation parameters
+For simulation (both in simulating networks and for MCMC estimation),
+the `burnin`, `interval`, and `sample_size` arguments are relevant and can be specified through set_options: 
+```{r, eval = FALSE}
+mlergm(net ~ edges + gwesp,
+       options = set_options(burnin = 5000, interval = 500, sample_size = 2500))
+```
+
+One of the primary benefits of using locally dependent block models is that simulation and computations of the blocks can be done independent, and in parallel. 
+The `set_options` function can control the number of cores used for computation and simulation. The default is `number_cores = detectCores(all.tests = FALSE, logical = TRUE) - 1`, which will typically be one less than the maximum number of available cores. 
+```{r, eval = FALSE}
+mlergm(net ~ edges + gwesp,
+       options = set_options(number_cores = 3))
+```
+The `number_cores` argument is relevant for both simulation and estimation procedures. 
+
+#### Estimation parameters
+For estimation procedures,
+the Fisher Scoring method of Hunter & Handcock (JCGS, 2006) is used. 
+Netwon-based optimization methods can be sensitive to the step length used. 
+These options can be changed by using the `step_len` argument. 
+Additionally, 
+there is an option to use a naive adaptive step length by setting `adaptive_step_len == TRUE`. 
+```{r, eval = FALSE}
+# Adjust the step length manually
+mlergm(net ~ edges + gwesp,
+       options = set_options(step_len = 0.25))
+
+# Use the naive adaptive step length 
+mlergm(net ~ edges + gwesp, 
+       options = set_options(adaptive_step_len == TRUE))
+```
+The adaptive step length 
+uses step lengths equal to the reciprocal of the $L_2$ norm of the increment, 
+i.e., 
+$$
+\begin{equation}
+\text{Step length} \;\;\;=\;\;\;
+\frac{1}{||\,\text{Increment}\,||_2}
+\end{equation}
+$$
+The outcome is a step length which automatically adjusts depending on the size of the increment. When the updates to the parameter vector $\boldsymbol{\theta}$ are small, the step length will be greater, encouraging faster convergence when near the solution. When the changes are larger, then the step length will be smaller as a result, and will more conservatively iterate towards the solution, which can help improve convergence, especially for estimation of curved ERGMs. 
+
+
+The number of maximum iterations performed can be adjusted for both the MCMLE procedure and the Newton-based Fisher Scoring algorithm,
+as well as the tolerance for the Fisher scoring convergence. 
+```{r, eval = FALSE}
+mlergm(net ~ edges + gwesp, 
+       options = set_options(MCMLE_max_iter = 10,
+                             NR_max_iter = 100,
+                             NR_tol = 1e-4))
+```
+
+
+The other options can be viewed in `help(set_options)`.
+
+
+
+
+
+
+
