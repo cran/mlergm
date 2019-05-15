@@ -38,7 +38,13 @@ MCMLE <- function(obj) {
     sd_check_sum <- colSums(sd_check)
     sd_check_sum <- ergm.etagrad(obj$est$theta, obj$net$etamap) %*% sd_check_sum
     if (sum(sd_check_sum == 0) > 0) { 
-      warning("Standard deviation of some simulated statistics are zero. Proposed model may be nearly degenerate.")
+      msg <- "Standard deviation of some simulated statistics are zero;" 
+      msg <- paste(msg, "estimation cannot continue.\n\n")
+      msg <- paste(msg, "Possible reasons include:\n") 
+      msg <- paste(msg, "    - The proposed model may be nearly degenerate or poorly specified.\n")
+      msg <- paste(msg, "    - The  Markov chain has failed to mix (adjusting simulation parameters may help).")
+      cat("\n\n")
+      stop(msg, call. = FALSE)
       degen_flag <- TRUE
     }
     

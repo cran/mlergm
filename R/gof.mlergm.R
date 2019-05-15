@@ -28,11 +28,11 @@
 gof.mlergm <- function(object, ..., options = set_options(), seed = NULL, gof_form = NULL) { 
  
   if (!is.mlergm(object)) { 
-    stop("Argument is not an 'mlergm' object. See 'help(mlergm') for details.\n")
+    stop("Argument is not an 'mlergm' object. See 'help(mlergm') for details.\n", call. = FALSE)
   }
 
   if (missing(object)) { 
-    stop("\nArgument 'object' not provided. An object of class 'mlergm' must be provided.\n")
+    stop("\nArgument 'object' not provided. An object of class 'mlergm' must be provided.\n", call. = FALSE)
   }
 
   if (!is.null(seed)) {
@@ -52,10 +52,10 @@ gof.mlergm <- function(object, ..., options = set_options(), seed = NULL, gof_fo
 
 
   if (!is.null(gof_form)) { 
-    if (as.character(gof_form) != 2) { 
+    if (length(as.character(gof_form)) != 2) { 
       msg <- "\nArgument 'gof_form' must be of the form '~ term1 + term2 ...' to be valid." 
       msg <- paste(msg, "Please see 'ergm.terms' for descriptions of valid term specifications.\n")
-      stop(msg)
+      stop(msg, call. = FALSE)
     }
     test_net <- net_list[[1]]
     test <- summary(as.formula(paste0("test_net ~ ", as.character(gof_form)[2])))

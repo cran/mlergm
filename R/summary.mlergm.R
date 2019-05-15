@@ -9,7 +9,7 @@
 summary.mlergm <- function(object, ...) { 
 
   if (!is.mlergm(object)) { 
-    stop("Argument must be an 'mlergm' object. See 'help(mlergm)' for details.\n")
+    stop("Argument must be an 'mlergm' object. See 'help(mlergm)' for details.\n", call. = FALSE)
   }
 
   if (object$estimation_status == "success") { 
@@ -54,13 +54,13 @@ summary.mlergm <- function(object, ...) {
       if (object$theta[i] >= 0) { 
         cat(" ")
       }
-      theta_val <- sprintf("%.4f", round(object$theta[i], 4))
+      theta_val <- sprintf("%.4f", signif(object$theta[i], 4))
       cat(theta_val)
       cat("    ") 
       if (object$se[i] >= 0) { 
         cat(" ")
       }
-      se_val <- sprintf("%.4f", round(object$se[i], 4))
+      se_val <- sprintf("%.4f", signif(object$se[i], 4))
       cat(se_val)
       cat("      ")
       p_value <- object$pvalue[i]
@@ -98,13 +98,13 @@ summary.mlergm <- function(object, ...) {
         if (object$between_theta[i] >= 0) {
           cat("")
         }
-        theta_val <- sprintf("%.4f", round(object$between_theta[i], 4))
+        theta_val <- sprintf("%.4f", signif(object$between_theta[i], 4))
         cat(theta_val)
         cat("    ")
         if (object$between_se[i] >= 0) {
           cat(" ")
         }
-        se_val <- sprintf("%.4f", round(object$between_se[i], 4))
+        se_val <- sprintf("%.4f", signif(object$between_se[i], 4))
         cat(se_val)
         
         cat("      ")

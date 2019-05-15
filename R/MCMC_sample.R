@@ -53,7 +53,7 @@ MCMC_sample <- function(obj) {
     
     # Simulate sufficient statistics
     cur_sim_stat <- simulate(form,
-                             statsonly = TRUE,
+                             output = "stats", 
                              sequential = obj$sim$seq,
                              control = control.simulate(MCMC.burnin = obj$sim$burnin,
                                                         MCMC.interval = obj$sim$interval),
@@ -89,7 +89,7 @@ MCMC_sample <- function(obj) {
       # If there are missing edges in the network perform a simulation
       if (obj$net$na_clust_flag[i]) {
         cur_sim_cond <- simulate(form,
-                                 statsonly = TRUE,
+                                 output = "stats", 
                                  sequential = obj$sim$seq, 
                                  control = control.simulate(MCMC.burnin = obj$sim$burnin,
                                                             MCMC.interval = obj$sim$interval),
@@ -279,7 +279,7 @@ par_sim_fun <- function(i, obj, split_ind) {
 
     # Simulate sufficient statistics
     cur_sim_stat <- simulate(form,
-                             statsonly = TRUE,
+                             output = "stats",
                              sequential = obj$sim$seq,
                              control = control.simulate(MCMC.burnin = obj$sim$burnin,
                                                         MCMC.interval = obj$sim$interval),
@@ -316,7 +316,7 @@ par_sim_fun <- function(i, obj, split_ind) {
       # If there are missing edges in the network perform a simulation
       if (obj$net$na_clust_flag[cur_ind]) {
         cur_sim_cond <- simulate(form,
-                                 statsonly = TRUE,
+                                 output = "stats",
                                  sequential = obj$sim$seq, 
                                  control = control.simulate(MCMC.burnin = obj$sim$burnin,
                                                             MCMC.interval = obj$sim$interval),

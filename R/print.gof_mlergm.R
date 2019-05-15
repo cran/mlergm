@@ -10,7 +10,8 @@
 print.gof_mlergm <- function(x, ...) { 
   
   if (!is.gof_mlergm(x)) { 
-    stop("Argument must be a 'gof_mlergm' object. See 'help(mlergm)' and 'help(gof.mlergm)' for details.\n")
+    stop("Argument must be a 'gof_mlergm' object. See 'help(mlergm)' and 'help(gof.mlergm)' for details.\n",
+         call. = FALSE)
   }  
 
   cat("\n") 

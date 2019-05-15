@@ -41,25 +41,26 @@ plot.gof_mlergm <- function(x, ...,
                             x_axis_size = NULL, y_axis_size = NULL, pretty_x = TRUE) {  
 
   if (!is.gof_mlergm(x)) { 
-    stop("Argument must be an 'gof_mlergm' object. See 'help(mlergm)' and 'help(gof.mlergm)' for details.\n")
+    stop("Argument must be an 'gof_mlergm' object. See 'help(mlergm)' and 'help(gof.mlergm)' for details.\n",
+         call. = FALSE)
   }
 
   # Check main arguments (plot arguments checked in boxplot_fun) 
   if (!is.logical(individual_plots)) { 
-    stop("Argument 'individual_plots' must be TRUE or FALSE.\n")
+    stop("Argument 'individual_plots' must be TRUE or FALSE.\n", call. = FALSE)
   }
   if (!is.logical(save_plots)) { 
-    stop("Argument 'save_plots' must be TRUE or FALSE.\n")
+    stop("Argument 'save_plots' must be TRUE or FALSE.\n", call. = FALSE)
   }
   if (!is.numeric(width)) { 
-    stop("Argument 'width' must be numeric.\n")
+    stop("Argument 'width' must be numeric.\n", call. = FALSE)
   } else if (width <= 0) { 
-    stop("Argument 'width' must be positive.\n")
+    stop("Argument 'width' must be positive.\n", call. = FALSE)
   }
   if (!is.numeric(height)) { 
-    stop("Argument 'height' must be numeric.\n")
+    stop("Argument 'height' must be numeric.\n", call. = FALSE)
   } else if (height <= 0) { 
-    stop("Argument 'height' must be positive.\n")
+    stop("Argument 'height' must be positive.\n", call. = FALSE)
   }
 
   # Parse the different model terms

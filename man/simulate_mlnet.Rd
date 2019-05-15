@@ -37,20 +37,21 @@ Function simulates a multilevel network by specifying a network size, node block
 Simulation of multilevel block networks is done with a Monte-Carlo Markov chain (MCMC) and can be done in parallel where \code{\link{set_options}} can be used to adjust the simulation settings (such as \code{burnin}, \code{interval}, and \code{sample_size}). Each within-block subgraph is given its own Markov chain, and so these settings are the settings to be used for each within-block chain.
 }
 \examples{
-
+\donttest{
 # Create a K = 2 block network with edge + gwesp term 
-net <- simulate_mlnet(form = network.initialize(40, directed = FALSE) ~ edges + gwesp, 
-                      node_memb = c(rep(1, 20), rep(2, 20)),
+net <- simulate_mlnet(form = network.initialize(30, directed = FALSE) ~ edges + gwesp, 
+                      node_memb = c(rep(1, 15), rep(2, 15)),
                       theta = c(-3, 0.5, 1.0), 
                       between_prob = 0.01,
-                      options = set_options(number_cores = 2, burnin = 5000))
+                      options = set_options(number_cores = 2, burnin = 2000))
 
 # Simulate a K = 2 block directed network, specifying a formula for between edges
-net <- simulate_mlnet(form = network.initialize(40, directed = TRUE) ~ edges + gwesp,
-                      node_memb = c(rep(1, 20), rep(2, 20)),
+net <- simulate_mlnet(form = network.initialize(30, directed = TRUE) ~ edges + gwesp,
+                      node_memb = c(rep(1, 15), rep(2, 15)),
                       theta = c(-3, 0.5, 1.0),
                       between_form = ~ edges + mutual, 
                       between_theta = c(-4, 2),
-                      options = set_options(number_cores = 2, burnin = 5000))
+                      options = set_options(number_cores = 2, burnin = 2000))
+}
 }
 \keyword{simulation}

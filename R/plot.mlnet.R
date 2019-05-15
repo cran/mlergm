@@ -24,7 +24,7 @@ plot.mlnet <- function(x, node_size = 2.5, palette = NULL, memb_colors = NULL,
                        layout_type = "kamadakawai", ...) {
 
   if (!is.mlnet(x)) { 
-    stop("Argument must be an 'mlnet' object. See 'help(mlnet)' for details.\n")
+    stop("Argument must be an 'mlnet' object. See 'help(mlnet)' for details.\n", call. = FALSE)
   }
 
   # Rename 'x' to a more informative name 

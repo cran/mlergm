@@ -18,21 +18,22 @@
 #' @importFrom stats rbinom 
 #' @keywords simulation
 #' @examples 
-#'
+#' \donttest{
 #' # Create a K = 2 block network with edge + gwesp term 
-#' net <- simulate_mlnet(form = network.initialize(40, directed = FALSE) ~ edges + gwesp, 
-#'                       node_memb = c(rep(1, 20), rep(2, 20)),
+#' net <- simulate_mlnet(form = network.initialize(30, directed = FALSE) ~ edges + gwesp, 
+#'                       node_memb = c(rep(1, 15), rep(2, 15)),
 #'                       theta = c(-3, 0.5, 1.0), 
 #'                       between_prob = 0.01,
-#'                       options = set_options(number_cores = 2, burnin = 5000))
+#'                       options = set_options(number_cores = 2, burnin = 2000))
 #'
 #' # Simulate a K = 2 block directed network, specifying a formula for between edges
-#' net <- simulate_mlnet(form = network.initialize(40, directed = TRUE) ~ edges + gwesp,
-#'                       node_memb = c(rep(1, 20), rep(2, 20)),
+#' net <- simulate_mlnet(form = network.initialize(30, directed = TRUE) ~ edges + gwesp,
+#'                       node_memb = c(rep(1, 15), rep(2, 15)),
 #'                       theta = c(-3, 0.5, 1.0),
 #'                       between_form = ~ edges + mutual, 
 #'                       between_theta = c(-4, 2),
-#'                       options = set_options(number_cores = 2, burnin = 5000))
+#'                       options = set_options(number_cores = 2, burnin = 2000))
+#' }
 simulate_mlnet <- function(form, node_memb, theta, parameterization = "standard",
                            seed = NULL, between_form = NULL, between_theta = NULL, between_prob = NULL,
                            options = set_options()) { 
@@ -40,25 +41,29 @@ simulate_mlnet <- function(form, node_memb, theta, parameterization = "standard"
   # Check required arguments are provided correctly 
   if (missing(form)) { 
     cat("\n")
-    stop("\nArgument 'form' not provided. A formula object must be provided.\n")    
+    stop("\nArgument 'form' not provided. A formula object must be provided.\n", call. = FALSE)
   }
   if (missing(theta)) { 
     cat("\n")
-    stop("\nArgument 'theta' not provided. The within-block model parameters must be provided.")
+    stop("\nArgument 'theta' not provided. The within-block model parameters must be provided.",
+         call. = FALSE)
   }
   if (missing(node_memb)) {
     cat("\n")
-    stop("\nArgument 'node_memb' not provided. The node memberships must be provided.\n")
+    stop("\nArgument 'node_memb' not provided. The node memberships must be provided.\n",
+         call. = FALSE)
   }
 
   # Check entries 
   if (!(is.null(between_form) == is.null(between_theta))) { 
     cat("\n")
-    stop("\nThe arguments 'between_form' and 'between_theta' must be both specified.\n")
+    stop("\nThe arguments 'between_form' and 'between_theta' must be both specified.\n",
+         call. = FALSE)
   }
   if (!is.null(between_form) & !is.null(between_prob)) { 
     cat("\n")
-    stop("\nArguments 'between_form' and 'between_prob' cannot both be specified.\n")
+    stop("\nArguments 'between_form' and 'between_prob' cannot both be specified.\n",
+         call. = FALSE)
   }
 
 

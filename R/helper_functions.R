@@ -6,7 +6,7 @@
 ###########################
 
 clean_mem <- function() {
-  invisible(gc());
+  invisible(gc())
 }
 
 norm2 <- function(vec) {
@@ -209,17 +209,17 @@ check_extensions <- function(mod_names) {
 get_network_from_formula <- function(form) {
   result <- tryCatch(
               expr = {
-                ergm.getnetwork(form);
+                ergm.getnetwork(form)
               },
               error = function(err) {
                 cat("\n")
                 msg <- paste("The formula object provided to mlergm does not",
                              "contain a 'network' class object.\n",
                              "Formulas are specified:  net ~ term1 + term2 + ...")
-                stop(msg)
+                stop(msg, call. = FALSE)
               },
               warning = function(warn) {
-                warning(warn);
+                warning(warn)
               })
   return(result)
 }
@@ -228,28 +228,28 @@ get_terms_from_formula <- function(form, net) {
   update.formula(form, net ~ .)
   result <- tryCatch(
               expr = {
-                terms <- as.character(form)[3];
+                terms <- as.character(form)[3]
                 sum_test <- summary(form)
                 return(terms)
               },
               error = function(err) {
-                bad_term <- str_match(as.character(err), "ERGM term (.*?) ")[2];
+                bad_term <- str_match(as.character(err), "ERGM term (.*?) ")[2]
                 if (is.na(bad_term)) {
-                  bad_covariate <- str_match(as.character(err), "ergm(.*?): (.*?) is")[3];
+                  bad_covariate <- str_match(as.character(err), "ergm(.*?): (.*?) is")[3]
                   err$message <- paste0("Covariate ", bad_covariate, " not a valid covariate.",
                                       " Please make sure that ", bad_covariate, " is a covariate of your network.")
                 } else {
                   err$message <- paste0("Model term ", bad_term, " not a valid model term.",
                                         " Please reference 'help(ergm.terms)' for a list of",
-                                        " valid model terms.");
+                                        " valid model terms.")
                 }
-                cat("\n");
-                stop(err);
+                cat("\n")
+                stop(err, call. = FALSE)
               },
               warning = function(warn) {
-                warning(warn);
-              });
-  return(terms);
+                warning(warn)
+              })
+  return(terms)
 }
 
 
@@ -258,39 +258,40 @@ check_and_convert_memb <- function(memb) {
   if (!is.vector(memb)) {
     vec_memb <- tryCatch(
                   expr = {
-                    as.vector(memb);
+                    as.vector(memb)
                   },
                   error = function(err) {
                     err$message <- paste0("Provided block memberships 'memb' not of class",
-                                          " 'vector' and not convertable to class 'vector'.");
+                                          " 'vector' and not convertable to class 'vector'.")
                     cat("\n")
-                    stop(err);
+                    stop(err, call. = FALSE)
                   },
                   warning = function(warn) {
-                    warning(warn);
-                  });
+                    warning(warn)
+                  })
   } else {
-    vec_memb <- memb;
+    vec_memb <- memb
   }
 
   # Now convert membership to numeric integer representation
-  converted_memb <- vec_memb;
-  unique_labels <- unique(vec_memb);
-  iter <- 1;
+  converted_memb <- vec_memb
+  unique_labels <- unique(vec_memb)
+  iter <- 1
   for (block_label in unique_labels) {
-    which_match <- which(block_label == vec_memb);
-    converted_memb[which_match] <- iter;
-    iter <- iter + 1;
+    which_match <- which(block_label == vec_memb)
+    converted_memb[which_match] <- iter
+    iter <- iter + 1
   }
   return_list <- list(memb_labels = unique_labels,
                       memb_internal = converted_memb)
-  return(return_list);
+  return(return_list)
 }
 
 check_net <- function(net) {
   if (!is.network(net)) {
     cat("\n")
-    stop("Left-hand side of provided formula does not contain a valid object of class 'network'.");
+    stop("Left-hand side of provided formula does not contain a valid object of class 'network'.",
+         call. = FALSE)
   }
 }
 
@@ -299,39 +300,40 @@ make_net_list <- function(net, memb_internal) {
   # Check that the dimensions of memb and net match
   if (network.size(net) != length(memb_internal)) {
     cat("\n")
-    stop("Number of nodes in network and length of block membership vector are not equal.")
+    stop("Number of nodes in network and length of block membership vector are not equal.",
+         call. = FALSE)
   }
 
-  list_block_ind <- as.numeric(unique(memb_internal));
-  net_list <- rep(list(NULL), length(list_block_ind));
+  list_block_ind <- as.numeric(unique(memb_internal))
+  net_list <- rep(list(NULL), length(list_block_ind))
   for (block_ind in list_block_ind) {
-    nodes_in_cur_block <- which(block_ind == memb_internal);
-    sub_net <- get.inducedSubgraph(net, v = nodes_in_cur_block);
-    net_list[[block_ind]] <- sub_net;
+    nodes_in_cur_block <- which(block_ind == memb_internal)
+    sub_net <- get.inducedSubgraph(net, v = nodes_in_cur_block)
+    net_list[[block_ind]] <- sub_net
   }
-  return(net_list);
+  return(net_list)
 }
 
 
 check_parameterization_type <- function(net_list, terms, parameterization, model) {
 
   # Check sufficient statistic sizes for each block
-  block_statistic_dimensions <- numeric(length(net_list));
+  block_statistic_dimensions <- numeric(length(net_list))
   for (i in 1:length(net_list)) {
-    cur_net <- net_list[[i]];
-    form_ <- as.formula(paste("cur_net ~", terms));
-    block_statistic_dimensions[i] <- length(summary(form_));
+    cur_net <- net_list[[i]]
+    form_ <- as.formula(paste("cur_net ~", terms))
+    block_statistic_dimensions[i] <- length(summary(form_))
   }
   which_largest <- which.max(block_statistic_dimensions)
-  largest_block <- net_list[[which_largest]];
-  form_ <- update(form_, largest_block ~ .);
-  statistic_names <- names(summary(form_));
-  model <- ergm_model(form_, largest_block);
-  eta_map <- ergm.etamap(model);
-  model_dimension <- max(block_statistic_dimensions);
+  largest_block <- net_list[[which_largest]]
+  form_ <- update(form_, largest_block ~ .)
+  statistic_names <- names(summary(form_))
+  model <- ergm_model(form_, largest_block)
+  eta_map <- model$etamap
+  model_dimension <- max(block_statistic_dimensions)
 
   if (parameterization %in% c("standard", "offset")) {
-    block_dims <- rep_row(rbind(seq(1, model_dimension)), length(net_list));
+    block_dims <- rep_row(rbind(seq(1, model_dimension)), length(net_list))
   }
 
   if (parameterization %in% c("offset")) {
@@ -359,9 +361,9 @@ check_parameterization_type <- function(net_list, terms, parameterization, model
                       statistic_names = statistic_names,
                       edge_loc = edge_loc,
                       mutual_loc = mutual_loc,
-                      which_largest = which_largest);
+                      which_largest = which_largest)
 
-  return(return_list);
+  return(return_list)
 }
 
 
@@ -391,19 +393,19 @@ find_first_non_null <-  function(...) {
 check_integer <- function(val, name) {
   if (!is.numeric(val)) {
     cat("\n")
-    stop(paste(name, "must be numeric."));
+    stop(paste(name, "must be numeric."), call. = FALSE)
   }
   if (length(val) != 1) {
     cat("\n")
-    stop(paste(name, "must be a single integer. Cannot supply multiple integers."));
+    stop(paste(name, "must be a single integer. Cannot supply multiple integers."), call. = FALSE)
   }
   if (!(val %% 1) == 0) {
     cat("\n")
-    stop(paste(name, "must be an integer."));
+    stop(paste(name, "must be an integer."), call. = FALSE)
   }
   if ((abs(val) > .Machine$integer.max)) {
     cat("\n")
-    stop(paste(name, "provided is not a valid integer."));
+    stop(paste(name, "provided is not a valid integer."), call. = FALSE)
   }
 }
 
@@ -580,25 +582,25 @@ boxplot_fun <- function(dat_mat, line_dat = NULL, cutoff = NULL,
 
   if (!is.null(line_dat)) { 
     if (length(line_dat) != ncol(dat_mat)) { 
-      msg <- "Dimensions of 'line_dat' and 'dat_mat' must match;" 
+      msg <- "Dimensions of 'line_dat' and 'dat_mat' must match" 
       msg <- paste(msg, "'line_dat' must be a vector of length equal") 
       msg <- paste(msg, "to the number of columns of 'dat_mat'.\n") 
-      stop(msg)
+      stop(msg, call. = FALSE)
     }
   }
 
   if (!is.numeric(x_angle)) { 
-    stop("Argument 'x_angle' must be numeric.\n")
+    stop("Argument 'x_angle' must be numeric.\n", call. = FALSE)
   } else if (length(x_angle) != 1) { 
-    stop("Argument 'x_angle' must be of length 1.\n")
+    stop("Argument 'x_angle' must be of length 1.\n", call. = FALSE)
   }
 
   if (!is.numeric(line_size)) { 
-    stop("Argument 'line_size' must be numeric.\n")
+    stop("Argument 'line_size' must be numeric.\n", call. = FALSE)
   } else if (length(line_size) != 1) { 
-    stop("Argument 'line_size' must be of length 1.\n")
+    stop("Argument 'line_size' must be of length 1.\n", call. = FALSE)
   } else if (line_size < 0) { 
-    stop("Argument 'line_size' must be non-negative.\n")
+    stop("Argument 'line_size' must be non-negative.\n", call. = FALSE)
   }
 
 
@@ -606,66 +608,66 @@ boxplot_fun <- function(dat_mat, line_dat = NULL, cutoff = NULL,
     x_axis_label <- stat_name 
   } 
   if (!(length(x_axis_label) == 1)) { 
-    stop("Argument 'x_axis_label' is not a single character string.\n") 
+    stop("Argument 'x_axis_label' is not a single character string.\n", call. = FALSE) 
   } else if (!is.character(x_axis_label)) { 
-    stop("Argument 'x_axis_label' is not a character string.\n")
+    stop("Argument 'x_axis_label' is not a character string.\n", call. = FALSE)
   }
   if (!(length(y_axis_label) == 1)) {
-    stop("Argument 'y_axis_label' is not a single character string.\n")
+    stop("Argument 'y_axis_label' is not a single character string.\n", call. = FALSE)
   } else if (!is.character(y_axis_label)) { 
-    stop("Argument 'y_axis_label' is not a character string.\n")
+    stop("Argument 'y_axis_label' is not a character string.\n", call. = FALSE)
   }
   if (!(length(plot_title) == 1)) { 
-    stop("Argument 'plot_title' is not a single character string.\n")
+    stop("Argument 'plot_title' is not a single character string.\n", call. = FALSE)
   } else if (!is.character(plot_title)) { 
-    stop("Argument 'plot_title' is not a character string.\n")
+    stop("Argument 'plot_title' is not a character string.\n", call. = FALSE)
   }
 
   if (!is.numeric(title_size)) { 
-    stop("Argument 'title_size' must be numeric.\n")
+    stop("Argument 'title_size' must be numeric.\n", call. = FALSE)
   } else if (length(title_size) != 1) { 
-    stop("Argument 'title_size' must be of length 1.\n")
+    stop("Argument 'title_size' must be of length 1.\n", call. = FALSE)
   } else if (title_size <= 0) { 
-    stop("Argument 'title_size' must be a positive number.\n")
+    stop("Argument 'title_size' must be a positive number.\n", call. = FALSE)
   }
 
   if (!is.numeric(axis_label_size)) {
     msg <- "Argument 'axis_label_size' must be a positive number." 
     msg <- paste(msg, "If you want to change the individual axis font sizes")
     msg <- paste(msg, "then you should use specify 'x_axis_label_size' and 'y_axis_label_size.\n")
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
   if (axis_label_size <= 0) { 
-    stop("Argument 'axis_label_size' must be a positive number.\n")
+    stop("Argument 'axis_label_size' must be a positive number.\n", call. = FALSE)
   }
   
   if (!is.numeric(axis_size)) { 
     msg <- "Argument 'axis_size' must be a positive number."
     msg <- paste(msg, "If you want to change the individual axis font sizes")
     msg <- paste(msg, "then you should use specify 'x_axis_size' and 'y_axis_size.\n")
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
   if (axis_size <= 0) { 
-    stop("Argument 'axis_size' must be a positive number.\n")
+    stop("Argument 'axis_size' must be a positive number.\n", call. = FALSE)
   }
   if (!is.numeric(axis_label_size)) {
     msg <- "Argument 'axis_label_size' must be a positive number."
     msg <- paste(msg, "If you want to change the individual axis font sizes")
     msg <- paste(msg, "then you should use specify 'x_axis_label_size' and 'y_axis_label_size.\n")
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
   if (axis_label_size <= 0) {
-    stop("Argument 'axis_label_size' must be a positive number.\n")
+    stop("Argument 'axis_label_size' must be a positive number.\n", call. = FALSE)
   }
 
   if (!is.numeric(axis_size)) {
     msg <- "Argument 'axis_size' must be a positive number."
     msg <- paste(msg, "If you want to change the individual axis font sizes")
     msg <- paste(msg, "then you should use specify 'x_axis_size' and 'y_axis_size.\n")
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
   if (axis_size <= 0) {
-    stop("Argument 'axis_size' must be a positive number.\n")
+    stop("Argument 'axis_size' must be a positive number.\n", call. = FALSE)
   }
   if (is.null(x_axis_label_size)) { 
     x_axis_label_size <- axis_label_size  
@@ -728,7 +730,7 @@ boxplot_fun <- function(dat_mat, line_dat = NULL, cutoff = NULL,
   first_colname <- colnames(dat_mat)[1]
   if (!is.null(x_labels) & !is.null(cutoff)) {
     if (cutoff != length(x_labels)) {
-      stop("Value of argument 'cutoff' must be equal to length of 'x_labels'.\n")
+      stop("Value of argument 'cutoff' must be equal to length of 'x_labels'.\n", call. = FALSE)
     }
     if (grepl("0", first_colname)) { 
       dat_mat <- dat_mat[ , 1:(cutoff + 1)]
@@ -737,10 +739,10 @@ boxplot_fun <- function(dat_mat, line_dat = NULL, cutoff = NULL,
     }
   } else if (!is.null(x_labels)) {
     if (length(x_labels) != ncol(dat_mat)) {
-      msg <- "Dimensions of 'x_labels' and 'dat_mat' must match;"
+      msg <- "Dimensions of 'x_labels' and 'dat_mat' must match"
       msg <- paste(msg, "'x_labels' must be a vector of character labels equal")
       msg <- paste(msg, "to the number of columns of 'dat_mat'.\n")
-      stop(msg) 
+      stop(msg, call. = FALSE) 
     }
     x_breaks <- 1:ncol(dat_mat)
   } else {
@@ -850,27 +852,27 @@ histplot_fun <- function(dat_mat, line_dat = NULL,
 
 
   if (!is.numeric(dat_mat)) { 
-    stop("Argument 'dat_mat' must be numeric.\n")
+    stop("Argument 'dat_mat' must be numeric.\n", call. = FALSE)
   } else if (!is.vector(dat_mat)) { 
-    stop("Argument 'dat_mat' must be a vector.")
+    stop("Argument 'dat_mat' must be a vector.", call. = FALSE)
   }
 
   if (!is.null(line_dat)) { 
     if (!is.numeric(line_dat)) { 
-      stop("Argument 'line_dat' must be numeric.\n")
+      stop("Argument 'line_dat' must be numeric.\n", call. = FALSE)
     } else if (!is.vector(line_dat)) { 
-      stop("Argument 'line_dat' must be a single number.\n")
+      stop("Argument 'line_dat' must be a single number.\n", call. = FALSE)
     } else if (length(line_dat) != 1) { 
-      stop("Argument 'line_dat' must be a single number.\n")
+      stop("Argument 'line_dat' must be a single number.\n", call. = FALSE)
     }
   }
 
   if (!is.numeric(line_size)) { 
-    stop("Argument 'line_size' must be numeric.\n")
+    stop("Argument 'line_size' must be numeric.\n", call. = FALSE)
   } else if (length(line_size) != 1) { 
-    stop("Argument 'line_size' must be of length 1.\n")
+    stop("Argument 'line_size' must be of length 1.\n", call. = FALSE)
   } else if (line_size < 0) { 
-    stop("Argument 'line_size' must be non-negative.\n")
+    stop("Argument 'line_size' must be non-negative.\n", call. = FALSE)
   }
 
 
@@ -878,66 +880,66 @@ histplot_fun <- function(dat_mat, line_dat = NULL,
     x_axis_label <- stat_name 
   } 
   if (!(length(x_axis_label) == 1)) { 
-    stop("Argument 'x_axis_label' is not a single character string.\n") 
+    stop("Argument 'x_axis_label' is not a single character string.\n", call. = FALSE) 
   } else if (!is.character(x_axis_label)) { 
-    stop("Argument 'x_axis_label' is not a character string.\n")
+    stop("Argument 'x_axis_label' is not a character string.\n", call. = FALSE)
   }
   if (!(length(y_axis_label) == 1)) {
-    stop("Argument 'y_axis_label' is not a single character string.\n")
+    stop("Argument 'y_axis_label' is not a single character string.\n", call. = FALSE)
   } else if (!is.character(y_axis_label)) { 
-    stop("Argument 'y_axis_label' is not a character string.\n")
+    stop("Argument 'y_axis_label' is not a character string.\n", call. = FALSE)
   }
   if (!(length(plot_title) == 1)) { 
-    stop("Argument 'plot_title' is not a single character string.\n")
+    stop("Argument 'plot_title' is not a single character string.\n", call. = FALSE)
   } else if (!is.character(plot_title)) { 
-    stop("Argument 'plot_title' is not a character string.\n")
+    stop("Argument 'plot_title' is not a character string.\n", call. = FALSE)
   }
 
   if (!is.numeric(title_size)) { 
-    stop("Argument 'title_size' must be numeric.\n")
+    stop("Argument 'title_size' must be numeric.\n", call. = FALSE)
   } else if (length(title_size) != 1) { 
-    stop("Argument 'title_size' must be of length 1.\n")
+    stop("Argument 'title_size' must be of length 1.\n", call. = FALSE)
   } else if (title_size <= 0) { 
-    stop("Argument 'title_size' must be a positive number.\n")
+    stop("Argument 'title_size' must be a positive number.\n", call. = FALSE)
   }
 
   if (!is.numeric(axis_label_size)) {
     msg <- "Argument 'axis_label_size' must be a positive number." 
     msg <- paste(msg, "If you want to change the individual axis font sizes")
     msg <- paste(msg, "then you should use specify 'x_axis_label_size' and 'y_axis_label_size.\n")
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
   if (axis_label_size <= 0) { 
-    stop("Argument 'axis_label_size' must be a positive number.\n")
+    stop("Argument 'axis_label_size' must be a positive number.\n", call. = FALSE)
   }
 
   if (!is.numeric(axis_size)) { 
     msg <- "Argument 'axis_size' must be a positive number."
     msg <- paste(msg, "If you want to change the individual axis font sizes")
     msg <- paste(msg, "then you should use specify 'x_axis_size' and 'y_axis_size.\n")
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
   if (axis_size <= 0) { 
-    stop("Argument 'axis_size' must be a positive number.\n")
+    stop("Argument 'axis_size' must be a positive number.\n", call. = FALSE)
   }
   if (!is.numeric(axis_label_size)) {
     msg <- "Argument 'axis_label_size' must be a positive number."
     msg <- paste(msg, "If you want to change the individual axis font sizes")
     msg <- paste(msg, "then you should use specify 'x_axis_label_size' and 'y_axis_label_size.\n")
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
   if (axis_label_size <= 0) {
-    stop("Argument 'axis_label_size' must be a positive number.\n")
+    stop("Argument 'axis_label_size' must be a positive number.\n", call. = FALSE)
   }
 
   if (!is.numeric(axis_size)) {
     msg <- "Argument 'axis_size' must be a positive number."
     msg <- paste(msg, "If you want to change the individual axis font sizes")
     msg <- paste(msg, "then you should use specify 'x_axis_size' and 'y_axis_size.\n")
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
   if (axis_size <= 0) {
-    stop("Argument 'axis_size' must be a positive number.\n")
+    stop("Argument 'axis_size' must be a positive number.\n", call. = FALSE)
   }
   if (is.null(x_axis_label_size)) { 
     x_axis_label_size <- axis_label_size  
@@ -1065,15 +1067,15 @@ histplot_fun <- function(dat_mat, line_dat = NULL,
 
 
 check_terms <- function(form, K) { 
-
   check_formula(form) 
   all_vars <- all.vars(form, functions = TRUE)
-  all_vars <- all_vars[!(all_vars %in% c("-", "+", "~"))]
+  all_vars <- all_vars[!(all_vars %in% c("-", "+", "~", ":"))]
   all_vars <- all_vars[-1]
 
   allowable_terms <- c("edges",
                        "mutual",
                        "gwesp",
+                       "dgwesp",
                        "gwdegree",
                        "gwodegree",
                        "gwidegree", 
@@ -1081,6 +1083,8 @@ check_terms <- function(form, K) {
                        "nodematch",
                        "transitiveties",
                        "cycle",
+                       "ttriple",
+                       "ctriple",
                        "ddsp",
                        "degree",
                        "desp",
@@ -1116,7 +1120,7 @@ check_terms <- function(form, K) {
         msg <- paste0(msg, all_vars[cur_loc], ".\n")
       }
     }
-    stop(msg)
+    stop(msg, call. = FALSE)
   }
 }
 
@@ -1126,14 +1130,14 @@ check_terms <- function(form, K) {
 check_formula <- function(form) { 
   
   if (!is.formula(form)) { 
-    stop("Argument 'form' must be a 'formula' class object.\n")
+    stop("Argument 'form' must be a 'formula' class object.\n", call. = FALSE)
   }
   
   can_get_network <- tryCatch(ergm.getnetwork(form), 
                               error = function(err) { return(err) })
 
   if (!is.network(can_get_network)) { 
-    stop("Cannot extract network from formula provided. Check that a valid formula was specified.")
+    stop("Cannot extract network from formula provided. Check that a valid formula was specified.", call. = FALSE)
   }
 
 }

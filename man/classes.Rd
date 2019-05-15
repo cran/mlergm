@@ -24,8 +24,8 @@ Vol. 1. Warsaw: Instytut Badań Edukacyjnych.
  Dolata, R. and Rycielski, P. (2014). 
  Wprowadzenie: założenia i cele badania szkolnych uwarunkowań efektywności kształcenia SUEK.
 
- Stewart, J. R., Schweinberger, M., Bojanowski, M, and Morris, M. (2018). 
- Multilevel network data facilitate statistical inference for curved ERGMs with geometrically weighted terms.
- Accepted, Social Networks.
+Stewart, J., Schweinberger, M., Bojanowski, M., and M. Morris (2019).
+Multilevel network data facilitate statistical inference for curved {ERGM}s with geometrically weighted terms.
+Social Networks, to appear.
 }
 \keyword{datasets}

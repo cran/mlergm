@@ -4,7 +4,8 @@ compute_initial_estimate <- function(obj) {
   if (!is.curved(obj$net$model)) {
     net <- reorder_block_matrix(obj$net$net_list)
     if (summary(net ~ edges) == 0) { 
-      stop("\nNetwork provided is empty and has no edges. Maximum likelihood estimator will not exist.") 
+      stop("Network provided is empty and has no edges. Maximum likelihood estimator will not exist.", 
+            call. = FALSE) 
     }
     form <- as.formula(paste0("net ~ ", as.character(obj$net$model$formula[3])))
     init <- suppressMessages(

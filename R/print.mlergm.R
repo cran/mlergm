@@ -8,7 +8,7 @@
 print.mlergm <- function(x, ...)  { 
   
   if (!is.mlergm(x)) { 
-    stop("Argument must be an 'mlegm' object. See 'help(mlergm)' for details.\n")
+    stop("Argument must be an 'mlegm' object. See 'help(mlergm)' for details.\n", call. = FALSE)
   }
 
   if (x$estimation_status == "success") { 

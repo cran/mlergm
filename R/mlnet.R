@@ -25,7 +25,7 @@ mlnet <- function(network, node_memb, directed = FALSE) {
     msg1 <- "The network provided cannot be converted to an object of class 'network'."
     msg2 <- "Compatibility can be checked using as.network() and network() functions." 
     cat("\n")
-    stop(paste(msg1, msg2))
+    stop(paste(msg1, msg2), call. = FALSE)
   } else {
     network <- can_make_network 
   } 

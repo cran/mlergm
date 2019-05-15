@@ -92,6 +92,11 @@ plot(gof_res, cutoff = 15)
 } 
 }
 \references{
+Schweinberger, M. and Stewart, J. (2019) 
+Concentration and consistency results for canonical and curved exponential-family random graphs. 
+The Annals of Statistics, to appear.
+
+
 Schweinberger, M. and Handcock, M. S. (2015).
 Local dependence in random graph models: characterization, properties and statistical inference.
 Journal of the Royal Statistical Society: Series B (Statistical Methodology), 77(3), 647-676.
@@ -123,6 +128,14 @@ R package version 2.4. \url{https://CRAN.R-project.org/package=sna}.
 Butts, C. (2008).
 network: a Package for Managing Relational Data in R.
 Journal of Statistical Software, 24(2). \url{http://www.jstatsoft.org/v24/i02/paper}.
+
+Stewart, J., Schweinberger, M., Bojanowski, M., and M. Morris (2019). 
+Multilevel network data facilitate statistical inference for curved {ERGM}s with geometrically weighted terms. 
+Social Networks, to appear.
+
+Schweinberger, M., Krivitsky, P. N., Butts, C.T. and J. Stewart (2018). 
+Exponential-family models of random graphs: Inference in finite-, super-, and infinite-population scenarios. 
+https://arxiv.org/abs/1707.04800
 }
 \seealso{
 \code{\link{gof.mlergm}}, \code{\link{mlnet}}

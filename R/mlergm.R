@@ -35,6 +35,11 @@
 #'
 #' @references
 #'
+#' Schweinberger, M. and Stewart, J. (2019) 
+#' Concentration and consistency results for canonical and curved exponential-family random graphs. 
+#' The Annals of Statistics, to appear.
+#'
+#'
 #' Schweinberger, M. and Handcock, M. S. (2015).
 #' Local dependence in random graph models: characterization, properties and statistical inference.
 #' Journal of the Royal Statistical Society: Series B (Statistical Methodology), 77(3), 647-676.
@@ -67,6 +72,13 @@
 #' network: a Package for Managing Relational Data in R.
 #' Journal of Statistical Software, 24(2). \url{http://www.jstatsoft.org/v24/i02/paper}.
 #'
+#' Stewart, J., Schweinberger, M., Bojanowski, M., and M. Morris (2019). 
+#' Multilevel network data facilitate statistical inference for curved {ERGM}s with geometrically weighted terms. 
+#' Social Networks, to appear.
+#'
+#' Schweinberger, M., Krivitsky, P. N., Butts, C.T. and J. Stewart (2018). 
+#' Exponential-family models of random graphs: Inference in finite-, super-, and infinite-population scenarios. 
+#' https://arxiv.org/abs/1707.04800
 #'
 #' @seealso \code{\link{gof.mlergm}}, \code{\link{mlnet}}
 #' @keywords estimation
@@ -114,7 +126,7 @@ mlergm <- function(form,
 
   # Check that required arguments are provided 
   if (missing(form)) {
-    stop("\nArgument 'form' not provided. A formula object must be provided.\n")
+    stop("\nArgument 'form' not provided. A formula object must be provided.\n", call. = FALSE)
   } else { 
     check_formula(form)
   }
@@ -124,7 +136,7 @@ mlergm <- function(form,
     if (inherits(net, "mlnet")) { 
       node_memb <- get.vertex.attribute(net, "node_memb")
     } else { 
-      stop("\nArgument 'node_memb' not provided. The node memberships must be provided.\n")
+      stop("\nArgument 'node_memb' not provided. The node memberships must be provided.\n", call. = FALSE)
     }
   }
   # Check that the formula and terms requested are valid
@@ -143,6 +155,7 @@ mlergm <- function(form,
 
   # Adjust formula if necessary 
   form <- adjust_formula(form) 
+  
 
   # Parse formula to get network and model
   net <- get_network_from_formula(form)
@@ -223,7 +236,7 @@ mlergm <- function(form,
     cat("\n\n")
 
   } else if (verbose > 0 & obj$est$ML_status_fail) {
-    cat("\n\nEstimation procedure stopping. Estimation unsuccesful.\n\n")
+    cat("\n\nEstimation procedure stopping. Estimation unsuccesful.\n\n", call. = FALSE)
   }
 
 

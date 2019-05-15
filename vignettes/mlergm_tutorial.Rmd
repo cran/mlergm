@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 The R package `mlergm`, appropriately named
 "Multilevel Exponential-Family Random Graph Models," 
-aims to provide a convenient method for estimating exponential-family 
+aims to provide a convenient platform for estimating exponential-family 
 random graph models (ERGMs) with multilevel structure. 
 Presently, 
 the beta release of the package supports estimation of ERGMs
@@ -35,11 +35,13 @@ namely that of the `ergm` framework,
 to provide as small a learning curve as possible to users already acquainted with 
 the `ergm` and `network` package framework. 
 In the following sections, 
-we aim to highlight how to use `mlergm` and what features it posses. 
+we aim to highlight how to use `mlergm` and some of the key features. 
 
-Before we proceed into demonstrating how to use `mlergm` and all of the functionality 
+Before we proceed into demonstrating how to use `mlergm` and the functionality 
 it has for multilevel networks analysis, 
-we first review some key ideas and terminology. 
+we first review background on multilevel networks,
+as well as the main statistical model the package contains at present. 
+
 
 #### Brief background on multilevel networks 
 
@@ -54,28 +56,36 @@ a multilevel network has a set of nodes $\mathcal{N}$
 (e.g., persons, brain regions, research articles) 
 partitioned into $K$ blocks  $\mathcal{A}_{1}, \ldots, \mathcal{A}_{K} \subseteq \mathcal{N}$ 
 (e.g., departments within a university, individual patient brains, 
-research journal), and a set of edges $\mathcal{E}$  which represent connections between nodes (e.g., advice seeking, functional connectivity, citation). 
+research journals), and a set of edges $\mathcal{E}$  which represent 
+interactions, relationships, or connections 
+between nodes (e.g., advice seeking, functional connectivity, citation). 
 Network data are typically represented by an adjacency matrix $\boldsymbol{X}$,
 where in the case of a binary, undirected network, 
 $X_{i,j} = 1$ if $\{i,j\} \in \mathcal{E}$,
 and $X_{i,j} = 0$ otherwise. 
-The within-block subgraph are usually denoted by $\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_k}$ ($k = 1 , \ldots, K$)
+The within-block subgraphs are denoted by $\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_k}$ ($k = 1 , \ldots, K$)
 and the between-block subgraphare denoted by 
 $\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_l}$
 ($1 \leq k < l \leq K$).
 
-In practice, researchers are usually interested in super-population inference, where the within-block network $\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_k}$ are assumed to have been generated from a distribution $\mathbb{P}_{\mathcal{A}_k, \, \boldsymbol{\theta}}$,
+In practice, researchers are usually interested in super-population inference, 
+where a network $X$, 
+define on a finite population of nodes $\mathcal{N}$, 
+is assumed to have been generated from 
+a distribution $\mathbb{P}_{\mathcal{N}, \, \boldsymbol{\theta}}$,
 and the goal is to estimate $\boldsymbol{\theta}$ in order to learn about mechanisms driving edge formation. 
+
 Past procedures have taken to estimating models for such network data
 by 
 
 1. Estimating an ERGM with no additional structure.
 2. Estimating individual ERGMs for each block subgraph.
 
-Both of these approaches fail to take into account the natural structure of the network. The first is unable to adaptively model differences in within- and between-block edge formations, while the second may overfit to the data by estimating separate parameters for each within-block subgraph, and does not use the additional structure to help estimate a general model. 
+Both of these approaches fail to take into account the natural structure of networks with block structure. The first is unable to adaptively model differences in within- and between-block edge formations, while the second may overfit to the data by estimating separate parameters for each within-block subgraph, and does not use the additional structure to help estimate a general model. 
 
 
-This can be accomplished by estimating a model of the form
+In `mlergm`, 
+we estimate statistical models for networks $X$ of the form 
 $$
 \begin{aligned}
 \mathbb{P}_{\mathcal{N}, \, \boldsymbol{\theta}, \, \boldsymbol{\beta}}\left(\boldsymbol{X} = \boldsymbol{x}\right) \;\;&= \;\;  \prod_{k=1}^{K} \, \mathbb{P}_{\mathcal{A}_k, \, \boldsymbol{\theta}} \left( \boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_k} = \boldsymbol{x}_{\mathcal{A}_k, \, \mathcal{A}_k}\right)  \;  \prod_{l \neq k}^{K} \mathbb{P}_{\{\mathcal{A}_k, \, \mathcal{A}_l\}, \, \beta}\left(\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_l} = \boldsymbol{x}_{\mathcal{A}_k, \, \mathcal{A}_l}\right),
@@ -85,13 +95,13 @@ where
 $$
 \begin{align}
 \mathbb{P}_{\{\mathcal{A}_k, \, \mathcal{A}_l\}, \, \boldsymbol{\beta}}\left(\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_l} = \boldsymbol{x}_{\mathcal{A}_k, \, \mathcal{A}_l}\right)
-\;\;&= \;\; \prod_{i \in \mathcal{A}_k} \; \prod_{j \in \mathcal{A}_l} \; \mathbb{P}_{\{i,\,j\}, \, \boldsymbol{\beta}}\left( X_{i,\,j} = x_{i,\,j}\right)
+\;\;&= \;\; \prod_{i \in \mathcal{A}_k} \; \prod_{j \in \mathcal{A}_l} \; \mathbb{P}_{\{i,\,j\}, \, \boldsymbol{\beta}}\left( X_{i,\,j} = x_{i,\,j}\right).
 \end{align} 
 $$
 
-The key model assumption is that the within-neighborood subgraphs $\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_k}$ ($k = 1, \ldots, K$) are mutually independent are that the between-block edges do not depend on the within-block edges. Dependence within the model is local in that it is restricted to blocks. Note as well that the $\boldsymbol{\theta}$ vector explicitly governs the within-block edges while the $\boldsymbol{\beta}$ vector governs the between-block edges, and the two are assumed to be variation independent. For more details on the model assumptions, see Schweinberger & Handcock (JRSS-B, 2015). 
+The key model assumption is that the within-neighborood subgraphs $\boldsymbol{X}_{\mathcal{A}_k, \, \mathcal{A}_k}$ ($k = 1, \ldots, K$) are mutually independent and that the between-block edges do not depend on the within-block edges. Dependence within the model is local in that it is restricted to blocks. Note as well that the $\boldsymbol{\theta}$ vector governs the within-block edges while the $\boldsymbol{\beta}$ vector governs the between-block edges, and the two are assumed to be variation independent. For more details on the model assumptions, see Schweinberger & Handcock (JRSS-B, 2015). 
 
-R package `mlergm` aims to provide an easy-to-use framework and interface for estimating models of the above form. In the coming sections, we will show how to use `mlergm` and will attempt to highlight key functionality that will help network scientists analyze such network data.
+R package `mlergm` aims to provide an easy-to-use framework and interface for estimating models of the above form. In the coming sections, we will show how to get started with `mlergm` and will attempt to highlight key functionality that will help network scientists analyze such network data.
 
 
 ## Getting started with `mlergm` 
@@ -116,8 +126,13 @@ load("vig_data.rda")
 ```
 
 A network (`net`) and a vector of block memberships (`node_memb`) is all we need to start working with `mlergm`. We note that `node_memb` does not need to be strictly numeric, as will be the case in later examples. 
+For obtaining `network` objects from adjacency matrices, 
+edgelists, 
+or other data structure, 
+we refer readers to the R package `network` which provides this functionality. 
+We will assume that the network `net` is always a `network` object. 
 
-Currently, `net` is an empty graph, which is uninteresting. We will show how synethetic networks can be simulated from a specified mode using the `simulate_mlnet`. 
+Currently, `net` is an empty graph, which is uninteresting. We will show how synethetic networks can be simulated from a specified model using the `simulate_mlnet` function. 
 
 ```{r, fig.width = 4, fig.height = 3, out.width = "50%", dpi = 300, fig.align = "center", eval = FALSE}
 # Simulate a network from the edge + gwesp model 
@@ -134,7 +149,8 @@ plot(net)
 
 The function `simulate_mlnet` returns a network which is both of class `mlnet` and `network`, and the `mlergm` package contains plotting methods for `mlnet` class networks, which allow for easy plotting of network data with block structure. 
 
-When actual data has been procured, the network data can be converted to an `mlnet` class using the `mlnet` function. 
+For real network data with block memberships, 
+the network data can be converted to an `mlnet` class using the `mlnet` function. 
 ```{r, fig.width = 6, fig.height = 3, fig.align = "center", out.width = "80%", out.height = "30%", dpi = 300}
 # Let us use the sampson data set as an example 
 data(sampson)
@@ -165,7 +181,11 @@ The `summary` function has a method for estimated objects of class `mlergm`, whi
 4. Significance codes and p-values for each estimate, as well as estimates of the standard error. 
 5. BIC for the within-block model. 
 
-Note that when we simulated this network, we did not specify for between-block edges. As such, the output of the `summary` function also is telling us that the between block MLE does not exist. Presently, `mlergm` attempts to estimate an edge coefficient when the number of between block edges is not extreme. 
+Note that when we simulated this network, we did not specify an edge parameter for the between-block edges. 
+As such, 
+the output of the `summary` function also is telling us that the between block MLE does not exist,
+because the number of between-block edges is precisely zero. 
+Presently, `mlergm` attempts to estimate an edge coefficient when the number of between block edges is not extreme. 
 
 We can evaluate goodness-of-fit of a fitted model of class `mlergm` by calling the `gof` method: 
 ```{r, fig.width = 8, fig.height = 4.5, fig.align = "center", out.height = "70%", out.width = "90%", dpi = 300, eval = FALSE}
@@ -178,7 +198,7 @@ plot(gof_res, cutoff = 15, pretty_x = TRUE)
 plot(gof_res, cutoff = 15, pretty_x = TRUE)
 ```
 
-The goodness-of-fit function will be discussed in more depth later. But, for now it is worth noting that the plot method argument `cutoff` specifies the maximum range to plot for the boxplots, and the argument `pretty_x` is a logical argument which indicates whether the `pretty` function should be used to decide the x-axis breaks for the boxplot, which can be helpful when the range is large. 
+The plot method argument `cutoff` specifies the maximum range to plot for the boxplots, and the argument `pretty_x` is a logical argument which indicates whether the `pretty` function should be used to decide the x-axis breaks for the boxplot, which can be helpful when the range is large. 
 
 
 
@@ -191,7 +211,7 @@ Firstly, the function is capable of doing two different parameterizations:
 2. 'offset': When this parameterization is used, the parameter vector $\boldsymbol{\theta}$ will feature the size-dependent 
    offsets of Krivitsky et. al (Statistical Methodology, 2011) for the edge term
    and, if the network is directed, the size-dependent offset of 
-   Krivitsky & Kolaczyk (Satatistical Science, 2015) for the  mutual edge term as well:
+   Krivitsky & Kolaczyk (Satatistical Science, 2015) for the  mutual edge term as well (when the mutual edge term is included in the model):
 $$
 \begin{equation} 
 \eta_{k,\text{edge}}(\boldsymbol{\theta}) \;\;\;=\;\; \boldsymbol{\theta}_{\text{edge}}      \,\;\;\;\;-\;\;   \log \, |\mathcal{A}_k|
@@ -242,7 +262,7 @@ mlergm(net ~ edges + gwesp,
        options = set_options(burnin = 5000, interval = 500, sample_size = 2500))
 ```
 
-One of the primary benefits of using locally dependent block models is that simulation and computations of the blocks can be done independent, and in parallel. 
+One of the primary benefits of using locally dependent block models is that simulation and computations of the blocks can be done independently and in parallel. 
 The `set_options` function can control the number of cores used for computation and simulation. The default is `number_cores = detectCores(all.tests = FALSE, logical = TRUE) - 1`, which will typically be one less than the maximum number of available cores. 
 ```{r, eval = FALSE}
 mlergm(net ~ edges + gwesp,
