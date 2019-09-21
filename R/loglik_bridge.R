@@ -1,5 +1,5 @@
 
-bridge_fun <- function(net, form, theta, offset, burnin, interval, num_bridges, sample_size) { 
+bridge_fun <- function(net, form, theta, offset, burnin, interval, num_bridges, sample_size, size) { 
   form <- as.formula(paste0("net ~ ", as.character(form)[3]))
   model <- ergm_model(form, net)
   etamap <- model$etamap
@@ -14,6 +14,21 @@ bridge_fun <- function(net, form, theta, offset, burnin, interval, num_bridges, 
         theta[mutual_loc] <- theta[mutual_loc] + log(network.size(net))
     }
   }
+  if (size == TRUE) { 
+    which_canonical <- which(etamap$canonical != 0)
+    theta[which_canonical] <- theta[which_canonical] * log_fun(network.size(net))
+    if (sum(etamap$canonical == 0) > 0) {
+      which_ <- which(etamap$canonical == 0)
+      if (length(which_) > 2) {
+        for (ii in seq(1, length(which_), by = 2)) {
+          theta[which_[ii]] <- theta[which_[ii]] * log_fun(network.size(net))
+        }
+      } else {
+        theta[which_[1]] <- theta[which_[1]] * log_fun(network.size(net))
+      }
+    }
+  }
+  
   bridge_val <- suppressMessages(
                   ergm.bridge.llr(form, 
                                   to = theta, 
@@ -28,7 +43,7 @@ bridge_fun <- function(net, form, theta, offset, burnin, interval, num_bridges, 
 }
 
 lik_fun <- function(form, memb, theta, bridge_num = 10, ncores = 3, offset = FALSE, 
-                    burnin = NULL, interval = NULL, sample_size = NULL) {
+                    burnin = NULL, interval = NULL, sample_size = NULL, size = FALSE) {
 
 
   # Make net_list + compute obs
@@ -58,14 +73,14 @@ lik_fun <- function(form, memb, theta, bridge_num = 10, ncores = 3, offset = FAL
     bridges <- mclapply(net_list,
                         bridge_fun, 
                         theta = theta, offset = offset, form = form, num_bridges = bridge_num, 
-                        burnin = burnin, interval = interval, sample_size = sample_size,
+                        burnin = burnin, interval = interval, sample_size = sample_size, size = size, 
                         mc.cores = ncores) 
   } else { 
     bridges <- parLapply(cl, 
                          net_list,
                          bridge_fun, 
                          theta = theta, offset = offset, form = form, num_bridges = bridge_num, 
-                         burnin = burnin, interval = interval, sample_size = sample_size)
+                         burnin = burnin, interval = interval, sample_size = sample_size, size = size)
     stopCluster(cl)
   }
 

@@ -7,7 +7,12 @@
 #' @param form A \code{\link{formula}} object of the form \code{network ~ model terms} which specifies how the within-block subgraphs are modeled.
 #' @param node_memb Vector of node block memberships.
 #' @param theta A vector of model parameters (coefficients) for the ERGM governing the within-subgraph edges. 
-#' @param parameterization Character vector indicating if the \code{standard} (non-size adjusted) parameterization should be used or if the \code{offset} size adjusted parameterization should be used. 
+#' @param parameterization Parameterization options include 'standard', 'offset', or 'size'.
+#' \itemize{
+#' \item 'standard' : Does not adjust the individual block parameters for size.
+#' \item 'offset' : The offset parameterization uses edge and mutual offsets along the lines of Krivitsky, Handcock, and Morris (2011) and Krivitsky and Kolaczyk (2015). The edge parameter is offset by \eqn{-log n(k)} and the mutual parameter is offset by \eqn{+log n(k)}, where \eqn{n(k)} is the size of the kth block.
+#' \item 'size' : Multiplies the block parameters by \eqn{log n(k)}, where \eqn{n(k)} is the size of the kth block.
+#' }
 #' @param seed Seed to be provided for reproducibility.  
 #' @param between_form A \code{\link{formula}} object of the form \code{~ model terms} which specifies how the within-block subgraphs are modeled. 
 #' @param between_theta A vector of model parameters (coefficients) for the ERGM governing the between-subgraph edges.
@@ -48,10 +53,16 @@ simulate_mlnet <- function(form, node_memb, theta, parameterization = "standard"
     stop("\nArgument 'theta' not provided. The within-block model parameters must be provided.",
          call. = FALSE)
   }
+
+  base_net <- get_network_from_formula(form)
   if (missing(node_memb)) {
-    cat("\n")
-    stop("\nArgument 'node_memb' not provided. The node memberships must be provided.\n",
-         call. = FALSE)
+    if (any(grepl("mlnet", is(base_net)))) {
+      node_memb <- get.vertex.attribute(base_net, "node_memb")
+    } else {  
+      cat("\n")
+      stop("\nArgument 'node_memb' not provided. The node memberships must be provided.\n",
+           call. = FALSE)
+    }
   }
 
   # Check entries 
@@ -77,6 +88,7 @@ simulate_mlnet <- function(form, node_memb, theta, parameterization = "standard"
   base_net <- get_network_from_formula(form)
   directed <- is.directed(base_net)
   net <- mlnet(base_net, node_memb, directed = directed)
+  model_temp <- ergm_model(form, base_net)
   rm(base_net); clean_mem() 
  
   memb_list <- check_and_convert_memb(node_memb)
@@ -106,6 +118,7 @@ simulate_mlnet <- function(form, node_memb, theta, parameterization = "standard"
     if (.Platform$OS.type == "unix") { 
     within_nets <- mclapply(net_list, 
                             function(sub_net, parameterization, theta, within_terms, burnin, interval, edge_loc, mutual_loc) {
+                            sub_form <- as.formula(paste0("sub_net ~ ", within_terms))
                               if (parameterization == "offset") { 
                                 if (is.numeric(edge_loc)) { 
                                   theta[edge_loc] <- theta[edge_loc] - log_fun(network.size(sub_net))
@@ -113,8 +126,21 @@ simulate_mlnet <- function(form, node_memb, theta, parameterization = "standard"
                                 if (is.numeric(mutual_loc)) {
                                   theta[mutual_loc] <- theta[mutual_loc] + log_fun(network.size(sub_net))
                                 }
+                              } else if (parameterization == "size") { 
+                                model <- ergm_model(sub_form, sub_net)
+                                which_canonical <- which(model$etamap$canonical != 0)
+                                theta[which_canonical] <- theta[which_canonical] * log_fun(network.size(sub_net))
+                                if (sum(model$etamap$canonical == 0) > 0) {
+                                  which_ <- which(model$etamap$canonical == 0)
+                                  if (length(which_) > 2) {
+                                    for (ii in seq(1, length(which_), by = 2)) {
+                                      theta[which_[ii]] <- theta[which_[ii]] * log_fun(network.size(sub_net))
+                                    }
+                                  } else { 
+                                    theta[which_[1]] <- theta[which_[1]] * log_fun(network.size(sub_net))
+                                  }
+                                }
                               }
-                              sub_form <- as.formula(paste0("sub_net ~ ", within_terms))
                               sub_net <- simulate(sub_form, 
                                                   nsim = 1,
                                                   coef = theta, 
@@ -137,15 +163,29 @@ simulate_mlnet <- function(form, node_memb, theta, parameterization = "standard"
     within_nets <- parLapply(cl,
                              net_list, 
                              function(sub_net, parameterization, theta, within_terms, burnin, interval, edge_loc, mutual_loc) {
-                              if (parameterization == "offset") {
+                               sub_form <- as.formula(paste0("sub_net ~ ", within_terms))
+                               if (parameterization == "offset") {
                                 if (is.numeric(edge_loc)) {
                                   theta[edge_loc] <- theta[edge_loc] - log_fun(network.size(sub_net))
                                 }
                                 if (is.numeric(mutual_loc)) {
                                   theta[mutual_loc] <- theta[mutual_loc] + log_fun(network.size(sub_net))
                                 }
+                              } else if (parameterization == "size") { 
+                                model <- ergm_model(sub_form, sub_net)
+                                which_canonical <- which(model$etamap$canonical != 0)
+                                theta[which_canonical] <- theta[which_canonical] * log_fun(network.size(sub_net))
+                                if (sum(model$etamap$canonical == 0) > 0) {
+                                  which_ <- which(model$etamap$canonical == 0)
+                                  if (length(which_) > 2) {
+                                    for (ii in seq(1, length(which_), by = 2)) {
+                                      theta[which_[ii]] <- theta[which_[ii]] * log_fun(network.size(sub_net))
+                                    }
+                                  } else {
+                                    theta[which_[1]] <- theta[which_[1]] * log_fun(network.size(sub_net))
+                                  }
+                                }
                               }
-                              sub_form <- as.formula(paste0("sub_net ~ ", within_terms))
                               sub_net <- simulate(sub_form,
                                                   nsim = 1,
                                                   coef = theta,
@@ -235,7 +275,6 @@ simulate_mlnet <- function(form, node_memb, theta, parameterization = "standard"
                            control = control.simulate(MCMC.burnin = obj$burnin, 
                                                       MCMC.interval = obj$interval),
                            nsim = 1)
-    save(hollow_net, between_edge_indices, file = "sim_stuff.rda")
     net[between_edge_indices] <- hollow_net[between_edge_indices] 
     rm(hollow_net); clean_mem() 
 

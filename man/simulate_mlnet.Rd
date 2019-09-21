@@ -15,7 +15,12 @@ simulate_mlnet(form, node_memb, theta, parameterization = "standard",
 
 \item{theta}{A vector of model parameters (coefficients) for the ERGM governing the within-subgraph edges.}
 
-\item{parameterization}{Character vector indicating if the \code{standard} (non-size adjusted) parameterization should be used or if the \code{offset} size adjusted parameterization should be used.}
+\item{parameterization}{Parameterization options include 'standard', 'offset', or 'size'.
+\itemize{
+\item 'standard' : Does not adjust the individual block parameters for size.
+\item 'offset' : The offset parameterization uses edge and mutual offsets along the lines of Krivitsky, Handcock, and Morris (2011) and Krivitsky and Kolaczyk (2015). The edge parameter is offset by \eqn{-log n(k)} and the mutual parameter is offset by \eqn{+log n(k)}, where \eqn{n(k)} is the size of the kth block.
+\item 'size' : Multiplies the block parameters by \eqn{log n(k)}, where \eqn{n(k)} is the size of the kth block.
+}}
 
 \item{seed}{Seed to be provided for reproducibility.}
 

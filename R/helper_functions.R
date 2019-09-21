@@ -332,8 +332,10 @@ check_parameterization_type <- function(net_list, terms, parameterization, model
   eta_map <- model$etamap
   model_dimension <- max(block_statistic_dimensions)
 
-  if (parameterization %in% c("standard", "offset")) {
+  if (parameterization %in% c("standard", "offset", "size")) {
     block_dims <- rep_row(rbind(seq(1, model_dimension)), length(net_list))
+  } else { 
+    stop("Argument 'parameterization' must be either 'standard', 'offset', or 'size'.", call. = FALSE)
   }
 
   if (parameterization %in% c("offset")) {

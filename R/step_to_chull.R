@@ -57,7 +57,7 @@ step_to_chull <- function(obj) {
     }
     obj$net$obs_stats_step <- obj$net$obs_stats * 1.05 * obj$est$gamma + (1 - 1.05 * obj$est$gamma) * sim_mean
     check_obs <- t(ergm.etagrad(obj$est$theta, obj$net$etamap) %*% obj$net$obs_stats_step)
-    check_ <- is.inCH(check_obs, check_sim)
+    check_ <- suppressMessages(is.inCH(check_obs, check_sim))
     iter <- iter + 1
   }
   if (step_flag) { 

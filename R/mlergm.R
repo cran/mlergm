@@ -9,7 +9,12 @@
 #' @param node_memb Vector (length equal to the number of nodes in the network) indicating to which  block or group the nodes belong.  
 #' If the network provided in \code{form} is an object of class \code{mlnet}, 
 #' then \code{node_memb} can be exctracted directly from the network and need not be provided. 
-#' @param parameterization Parameterization options include 'standard' and 'offset'.  The offset parameterization uses edge and mutual offsets along the lines of Krivitsky, Handcock, and Morris (2011) and Krivitsky and Kolaczyk (2015).
+#' @param parameterization Parameterization options include 'standard', 'offset', or 'size'. 
+#' \itemize{
+#' \item 'standard' : Does not adjust the individual block parameters for size. 
+#' \item 'offset' : The offset parameterization uses edge and mutual offsets along the lines of Krivitsky, Handcock, and Morris (2011) and Krivitsky and Kolaczyk (2015). The edge parameter is offset by \eqn{-log n(k)} and the mutual parameter is offset by \eqn{+log n(k)}, where \eqn{n(k)} is the size of the kth block.  
+#' \item 'size' : Multiplies the block parameters by \eqn{log n(k)}, where \eqn{n(k)} is the size of the kth block.
+#' }
 #' @param options See \code{\link{set_options}} for details. 
 #' @param theta_init Parameter vector of initial estimates for theta to be used. 
 #' @param verbose Controls the level of output. A value of \code{0} corresponds to no output, except for warnings; a value of \code{1} corresponds to minimal output, and a value of \code{2} corresponds to full output. 
@@ -253,7 +258,8 @@ mlergm <- function(form,
                               offset = obj$est$parameterization == "offset",
                               burnin = obj$sim$bridge_burnin, 
                               interval = obj$sim$bridge_interval, 
-                              sample_size = obj$sim$bridge_sample_size) 
+                              sample_size = obj$sim$bridge_sample_size,
+                              size = obj$est$parameterization == "size") 
         obj$bic <- compute_bic(obj) 
       } else { 
         obj$likval <- NULL

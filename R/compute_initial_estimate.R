@@ -21,6 +21,22 @@ compute_initial_estimate <- function(obj) {
         obj$est$theta[obj$net$mutual_loc] <- obj$est$theta[obj$net$mutual_loc] - log(median(obj$net$clust_sizes))
       }
       obj$est$theta_0 <- obj$est$theta 
+    } else if (obj$est$parameterization == "size") { 
+      cur_theta <- init$coef 
+      which_canonical <- which(obj$net$etamap$canonical != 0)
+      cur_theta[which_canonical] <- cur_theta[which_canonical] / log_fun(median(obj$net$clust_sizes))
+      if (sum(obj$net$etamap$canonical == 0) > 0) {
+        which_ <- which(obj$net$etamap$canonical == 0)
+        if (length(which_) > 2) {
+          for (ii in seq(1, length(which_), by = 2)) {
+            cur_theta[which_[ii]] <- cur_theta[which_[ii]] / log_fun(median(obj$net$clust_sizes))
+          }
+        } else {
+          cur_theta[which_[1]] <- cur_theta[which_[1]] / log_fun(median(obj$net$clust_sizes))
+        }
+      }
+      obj$est$theta <- cur_theta 
+      obj$est$theta_0 <- obj$est$theta 
     } else {  
       obj$est$theta <- init$coef
       obj$est$theta_0 <- obj$est$theta 
@@ -45,6 +61,22 @@ compute_initial_estimate <- function(obj) {
         obj$est$theta[obj$net$mutual_loc] <- obj$est$theta[obj$net$mutual_loc] - log(median(obj$net$clust_sizes))
       }
       obj$est$theta_0 <- obj$est$theta 
+    } else if (obj$est$parameterization == "size") { 
+      cur_theta <- init$coef
+      which_canonical <- which(obj$net$etamap$canonical != 0)
+      cur_theta[which_canonical] <- cur_theta[which_canonical] / log_fun(median(obj$net$clust_sizes))
+      if (sum(obj$net$etamap$canonical == 0) > 0) {
+        which_ <- which(obj$net$etamap$canonical == 0)
+        if (length(which_) > 2) {
+          for (ii in seq(1, length(which_), by = 2)) {
+            cur_theta[which_[ii]] <- cur_theta[which_[ii]] / log_fun(median(obj$net$clust_sizes))
+          }
+        } else {
+          cur_theta[which_[1]] <- cur_theta[which_[1]] / log_fun(median(obj$net$clust_sizes))
+        }
+      }
+      obj$est$theta <- cur_theta
+      obj$est$theta_0 <- obj$est$theta
     } else {
       obj$est$theta <- init$coef
       obj$est$theta_0 <- obj$est$coef 

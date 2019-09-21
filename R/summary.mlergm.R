@@ -24,6 +24,9 @@ summary.mlergm <- function(object, ...) {
     if (object$parameterization == "offset") { 
       cat("Parameterization set to 'offset'\n")
     }
+    if (object$parameterization == "size") { 
+      cat("Parameterization set to 'size'\n")
+    }
     cat("\n")
     cat("Number of blocks:  ") 
     cat(paste(length(unique(object$node_memb))))
@@ -34,14 +37,17 @@ summary.mlergm <- function(object, ...) {
     cat("\n\n")
     cat("Monte Carlo MLE Results:\n")
     if ((object$parameterization == "offset") & ("edges" %in% names(object$theta))) {
-      cat("    Block edge parameter    =  edges  - log(Block size)\n")
+      cat("    Within-block edge parameter    =  edges  - log(Block size)\n")
     } 
     if ((object$parameterization == "offset") & ("mutual" %in% names(object$theta))) { 
-      cat("    Block mutual parameter  =  mutual + log(Block size)\n")
+      cat("    Within-block mutual parameter  =  mutual + log(Block size)\n")
+    }
+    if (object$parameterization == "size") { 
+      cat("    Within-lock parameter = parameter * log n(k),   n(k) is the size of block k\n")
     }
     cat("\n")
     theta_names <- names(object$theta)
-    max_char <- max(nchar(c(theta_names, "Between edges", "Between mutual")))
+    max_char <- max(nchar(c(theta_names, "between edges", "between mutual")))
     name_space <- paste(rep(" ", max_char), collapse = "")
     cat(name_space)
     cat("    Estimate   Std. Error    p-value    Sig.\n")
@@ -137,7 +143,7 @@ summary.mlergm <- function(object, ...) {
     cat("BIC:  ")
     if (!is.null(object$bic)) { 
       cat(paste(round(object$bic, digits = 3)))
-      cat("\n* Note: BIC is for within-block model.")
+      cat("\n* Note: BIC is based on the within-block model, and ignores the between-block model.")
     } else { 
       cat("Not estimated.")
     }
