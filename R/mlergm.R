@@ -79,7 +79,7 @@
 #'
 #' Stewart, J., Schweinberger, M., Bojanowski, M., and M. Morris (2019). 
 #' Multilevel network data facilitate statistical inference for curved {ERGM}s with geometrically weighted terms. 
-#' Social Networks, to appear.
+#' Social Networks, 59, 98-119.
 #'
 #' Schweinberger, M., Krivitsky, P. N., Butts, C.T. and J. Stewart (2018). 
 #' Exponential-family models of random graphs: Inference in finite-, super-, and infinite-population scenarios. 
@@ -224,7 +224,7 @@ mlergm <- function(form,
 
   # Call MCMLE to perform estimation
   if (verbose > 0) { 
-    cat("\n\n\nBegining Monte-Carlo maximum likelihood estimation\n")
+    cat("\n\n\nBeginning Monte-Carlo maximum likelihood estimation\n")
     cat("===================================================")
     cat("\n")
   }

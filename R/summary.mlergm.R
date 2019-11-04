@@ -43,7 +43,7 @@ summary.mlergm <- function(object, ...) {
       cat("    Within-block mutual parameter  =  mutual + log(Block size)\n")
     }
     if (object$parameterization == "size") { 
-      cat("    Within-lock parameter = parameter * log n(k),   n(k) is the size of block k\n")
+      cat("    Within-block parameter = parameter * log n(k),   n(k) is the size of block k\n")
     }
     cat("\n")
     theta_names <- names(object$theta)

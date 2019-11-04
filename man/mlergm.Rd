@@ -136,7 +136,7 @@ Journal of Statistical Software, 24(2). \url{http://www.jstatsoft.org/v24/i02/pa
 
 Stewart, J., Schweinberger, M., Bojanowski, M., and M. Morris (2019). 
 Multilevel network data facilitate statistical inference for curved {ERGM}s with geometrically weighted terms. 
-Social Networks, to appear.
+Social Networks, 59, 98-119.
 
 Schweinberger, M., Krivitsky, P. N., Butts, C.T. and J. Stewart (2018). 
 Exponential-family models of random graphs: Inference in finite-, super-, and infinite-population scenarios. 
