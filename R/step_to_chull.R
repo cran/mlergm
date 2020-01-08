@@ -51,7 +51,7 @@ step_to_chull <- function(obj) {
     
     if (obj$est$gamma == 0) {
       if (obj$verbose > 1) {  
-        cat("\n\nWARNING: gamma = 0 required to move observation into the convex hull.")
+        cat("\n\nWARNING: gamma = 0 required to move observation into the simulated convex hull. This could be due to a poor initial estimate, insufficient MCMC parameters indicating the Markov Chain did not mix well, or possible model misspecification.")
       }
       zero_flag <- TRUE
     }
@@ -69,7 +69,7 @@ step_to_chull <- function(obj) {
       cat("\n")
       cat("    Using adjusted observed sufficient statistics vector with gamma = ")
       cat(round(obj$est$gamma, digits = 4))
-      cat(". L1 norm of difference: ")
+      cat(". L1 norm of difference between observation and adjusted observation: ")
       L1_diff <- sum(abs(obj$net$obs_stats_step - obj$net$obs_stats))
       if (round(L1_diff, digits = 3) < 0.001) { 
         cat("<0.001")

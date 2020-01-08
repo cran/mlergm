@@ -1,6 +1,5 @@
 
 estimate_between_block <- function(obj)  {
-  
   if (obj$verbose > 0) {  
     cat("\n\nEstimating between block model.")
   }
@@ -74,33 +73,49 @@ estimate_between_block <- function(obj)  {
     stat_val <- summary(between_network ~ edges)
     if (stat_val > 0 & stat_val < max_edges) { 
       between_est <- logit(summary(between_network ~ edges) / max_edges)
+      
       obj$est$between_theta <- between_est
-      names(obj$est$between_theta) <- "Between edges" 
+      names(obj$est$between_theta) <- "Between-block edges" 
 
       obj$est$between_se <- compute_between_se(between_est, NULL, max_edges) 
-      names(obj$est$between_se) <- "Between edges"
+      names(obj$est$between_se) <- "Between-block edges"
+      
+      if (obj$est$parameterization == "size") {
+        obj$est$between_theta <- obj$est$between_theta / log(sum(obj$net$clust_sizes))
+        obj$est$between_se    <- obj$est$between_se / log(sum(obj$net$clust_sizes))
+      } else if (obj$est$parameterization == "offset") {
+        obj$est$between_theta <- obj$est$between_theta + log(sum(obj$net$clust_sizes))
+      }
+
 
       obj$est$between_pvalue <- 2 * pnorm(-abs(obj$est$between_theta / obj$est$between_se))
-      names(obj$est$between_pvalue) <- "Between edges"
+      names(obj$est$between_pvalue) <- "Between-block edges"
 
     } else { 
-      obj$est$between_theta <- "Between block MLE does not exist." 
+      obj$est$between_theta <- "Between-block MLE does not exist." 
     }
   } else { 
     stat_val <- summary(between_network ~ edges) 
     if (stat_val > 0 & stat_val < max_edges) { 
       between_est <- logit(summary(between_network ~ edges) / nrow(between_edge_indices))
       obj$est$between_theta <- between_est
-      names(obj$est$between_theta) <- "Between edges"
+      names(obj$est$between_theta) <- "Between-block edges"
 
       obj$est$between_se <- compute_between_se(between_est, NULL, max_edges) 
-      names(obj$est$between_se) <- "Between edges"
+      names(obj$est$between_se) <- "Between-block edges"
+
+      if (obj$est$parameterization == "size") {
+        obj$est$between_theta <- obj$est$between_theta / log(sum(obj$net$clust_sizes))
+        obj$est$between_se    <- obj$est$between_se / log(sum(obj$net$clust_sizes))
+      } else if (obj$est$parameterization == "offset") {
+        obj$est$between_theta <- obj$est$between_theta + log(sum(obj$net$clust_sizes))
+      }
 
       obj$est$between_pvalue <- 2 * pnorm(-abs(obj$est$between_theta / obj$est$between_se))
-      names(obj$est$between_pvalue) <- "Between edges"
+      names(obj$est$between_pvalue) <- "Between-block edges"
 
     } else { 
-      obj$est$between_theta <- "Between block MLE does not exist." 
+      obj$est$between_theta <- "Between-block MLE does not exist." 
     } 
   }
   return(obj)
