@@ -4,13 +4,30 @@
 \alias{plot.gof_mlergm}
 \title{Plot goodness-of-fit results}
 \usage{
-\method{plot}{gof_mlergm}(x, ..., individual_plots = FALSE,
-  save_plots = FALSE, show_plots = TRUE, width = 8, height = 4.5,
-  cutoff = NULL, x_labels = NULL, x_angle = 0, x_axis_label = NULL,
-  y_axis_label = "Count", plot_title = "", title_size = 18,
-  axis_label_size = 14, axis_size = 10, line_size = 1,
-  x_axis_label_size = NULL, y_axis_label_size = NULL,
-  x_axis_size = NULL, y_axis_size = NULL, pretty_x = TRUE)
+\method{plot}{gof_mlergm}(
+  x,
+  ...,
+  individual_plots = FALSE,
+  save_plots = FALSE,
+  show_plots = TRUE,
+  width = 8,
+  height = 4.5,
+  cutoff = NULL,
+  x_labels = NULL,
+  x_angle = 0,
+  x_axis_label = NULL,
+  y_axis_label = "Count",
+  plot_title = "",
+  title_size = 18,
+  axis_label_size = 14,
+  axis_size = 10,
+  line_size = 1,
+  x_axis_label_size = NULL,
+  y_axis_label_size = NULL,
+  x_axis_size = NULL,
+  y_axis_size = NULL,
+  pretty_x = TRUE
+)
 }
 \arguments{
 \item{x}{An object of class \code{gof_mlergm}, produced by \code{\link{gof.mlergm}}.}

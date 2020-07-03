@@ -4,8 +4,7 @@
 \alias{gof.mlergm}
 \title{Evaluate the goodness-of-fit of an estimated model.}
 \usage{
-\method{gof}{mlergm}(object, ..., options = set_options(), seed = NULL,
-  gof_form = NULL)
+\method{gof}{mlergm}(object, ..., options = set_options(), seed = NULL, gof_form = NULL)
 }
 \arguments{
 \item{object}{An object of class \code{\link{mlergm}}, likely produced by function \code{\link{mlergm}}.}

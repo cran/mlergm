@@ -4,9 +4,17 @@
 \alias{simulate_mlnet}
 \title{Simulate a multilevel network}
 \usage{
-simulate_mlnet(form, node_memb, theta, parameterization = "standard",
-  seed = NULL, between_form = NULL, between_theta = NULL,
-  between_prob = NULL, options = set_options())
+simulate_mlnet(
+  form,
+  node_memb,
+  theta,
+  parameterization = "standard",
+  seed = NULL,
+  between_form = NULL,
+  between_theta = NULL,
+  between_prob = NULL,
+  options = set_options()
+)
 }
 \arguments{
 \item{form}{A \code{\link{formula}} object of the form \code{network ~ model terms} which specifies how the within-block subgraphs are modeled.}

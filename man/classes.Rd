@@ -4,7 +4,9 @@
 \name{classes}
 \alias{classes}
 \title{Polish school classes data set.}
-\format{An \code{mlnet} object.}
+\format{
+An \code{mlnet} object.
+}
 \usage{
 data(classes)
 }

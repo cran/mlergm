@@ -1017,7 +1017,8 @@ histplot_fun <- function(dat_mat, line_dat = NULL,
   hist_dat <- as.data.frame(cbind(hist_values, geom_id))
   rownames(hist_dat) <- NULL
   colnames(hist_dat) <- c("values", "geom_id")
-  hist_dat$values <- as.numeric(levels(hist_dat$values))[hist_dat$values]
+  hist_dat$values <- as.numeric(hist_dat$values)
+  #hist_dat$values <- as.numeric(levels(hist_dat$values))[hist_dat$values]
  
   
   # NULL out the aes() inputs to appease CRAN check 
@@ -1100,10 +1101,15 @@ check_terms <- function(form, K) {
                        "nodeifactor",
                        "nodeofactor",
                        "nodemix", 
+                       "nodecov", 
+                       "nodeicov", 
+                       "nodeocov",
+                       "edgecov",
                        "idegree",
                        "odegree",
                        "ostar", 
-                       "twopath")
+                       "twopath",
+                       "absdiff")
   if (K == 1) { 
     allowable_terms <- c(allowable_terms, "sender", "receiver", "sociality")
   }

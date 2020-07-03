@@ -93,9 +93,7 @@
 #' @param \dots arguments passed directly to linear program solver
 #' @return Logical, telling whether \code{p} is (or all rows of \code{p} are)
 #' in the closed convex hull of the points in \code{M}.
-#' @references \itemize{ \item
-#' \url{http://www.cs.mcgill.ca/~fukuda/soft/polyfaq/node22.html}
-#' 
+#' @references \itemize{ 
 #' \item Hummel, R. M., Hunter, D. R., and Handcock, M. S. (2012), Improving
 #' Simulation-Based Algorithms for Fitting ERGMs, Journal of Computational and
 #' Graphical Statistics, 21: 920-939. }

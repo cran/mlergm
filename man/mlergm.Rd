@@ -6,9 +6,16 @@
 \alias{summary.mlergm}
 \title{Multilevel Exponential-Family Random Graph Models}
 \usage{
-mlergm(form, node_memb, parameterization = "standard",
-  options = set_options(), theta_init = NULL, verbose = 0,
-  eval_loglik = TRUE, seed = NULL)
+mlergm(
+  form,
+  node_memb,
+  parameterization = "standard",
+  options = set_options(),
+  theta_init = NULL,
+  verbose = 0,
+  eval_loglik = TRUE,
+  seed = NULL
+)
 
 \method{print}{mlergm}(x, ...)
 

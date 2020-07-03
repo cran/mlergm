@@ -4,13 +4,23 @@
 \alias{set_options}
 \title{Set and adjust options and settings.}
 \usage{
-set_options(burnin = 10000, interval = 1000, sample_size = 1000,
-  NR_tol = 1e-04, NR_max_iter = 50, MCMLE_max_iter = 10,
-  do_parallel = TRUE, number_cores = detectCores(all.tests = FALSE,
-  logical = TRUE) - 1, adaptive_step_len = TRUE,
-  step_len_multiplier = 0.5, step_len = 1, bridge_num = 10,
-  bridge_burnin = 10000, bridge_interval = 500,
-  bridge_sample_size = 5000)
+set_options(
+  burnin = 10000,
+  interval = 1000,
+  sample_size = 1000,
+  NR_tol = 1e-04,
+  NR_max_iter = 50,
+  MCMLE_max_iter = 10,
+  do_parallel = TRUE,
+  number_cores = detectCores(all.tests = FALSE, logical = TRUE) - 1,
+  adaptive_step_len = TRUE,
+  step_len_multiplier = 0.5,
+  step_len = 1,
+  bridge_num = 10,
+  bridge_burnin = 10000,
+  bridge_interval = 500,
+  bridge_sample_size = 5000
+)
 }
 \arguments{
 \item{burnin}{The burnin length for MCMC chains.}

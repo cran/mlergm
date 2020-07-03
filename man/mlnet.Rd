@@ -7,10 +7,19 @@
 \usage{
 mlnet(network, node_memb, directed = FALSE)
 
-\method{plot}{mlnet}(x, node_size = 2.5, palette = NULL,
-  memb_colors = NULL, arrow.gap = 0.015, arrow.size = 4,
-  color_legend_title = "", legend = TRUE, legend.position = "right",
-  layout_type = "kamadakawai", ...)
+\method{plot}{mlnet}(
+  x,
+  node_size = 2.5,
+  palette = NULL,
+  memb_colors = NULL,
+  arrow.gap = 0.015,
+  arrow.size = 4,
+  color_legend_title = "",
+  legend = TRUE,
+  legend.position = "right",
+  layout_type = "kamadakawai",
+  ...
+)
 }
 \arguments{
 \item{network}{Either a \code{\link{network}} object, an adjacency matrix, or an edge list.}
