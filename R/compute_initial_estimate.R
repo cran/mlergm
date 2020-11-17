@@ -7,7 +7,7 @@ compute_initial_estimate <- function(obj) {
       stop("Network provided is empty and has no edges. Maximum likelihood estimator will not exist.", 
             call. = FALSE) 
     }
-    form <- as.formula(paste0("net ~ ", as.character(obj$net$model$formula[3])))
+    form <- as.formula(paste0("net ~ ", obj$net$terms))
     init <- suppressMessages(
               ergm(form, estimate = "MPLE", constraints = ~ blockdiag("node_memb_group"), 
                    verbose = FALSE, eval.loglik = FALSE)
@@ -45,7 +45,7 @@ compute_initial_estimate <- function(obj) {
   # Find the initial point for a curved ERGM
   } else {
     net <- reorder_block_matrix(obj$net$net_list)
-    form <- as.formula(paste0("net ~ ", as.character(obj$net$model$formula[3])))  
+    form <- as.formula(paste0("net ~ ", obj$net$terms)) 
     model <- ergm_model(form, net) 
     fixed_form   <- fix.curved(form, rep(0.25, length(model$etamap$canonical)))$formula
     init <- suppressMessages(

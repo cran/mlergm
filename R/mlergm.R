@@ -75,7 +75,7 @@
 #'
 #' Butts, C. (2008).
 #' network: a Package for Managing Relational Data in R.
-#' Journal of Statistical Software, 24(2). \url{http://www.jstatsoft.org/v24/i02/paper}.
+#' Journal of Statistical Software, 24(2). 
 #'
 #' Stewart, J., Schweinberger, M., Bojanowski, M., and M. Morris (2019). 
 #' Multilevel network data facilitate statistical inference for curved {ERGM}s with geometrically weighted terms. 
@@ -152,12 +152,6 @@ mlergm <- function(form,
     set.seed(seed, "L'Ecuyer")
   } 
 
-  if (verbose > 0) { 
-    cat("\nBeginning estimation procedure for:")
-    cat(paste0("\n       ", deparse(form)))
-  }  
-
-
   # Adjust formula if necessary 
   form <- adjust_formula(form) 
   
@@ -166,7 +160,12 @@ mlergm <- function(form,
   net <- get_network_from_formula(form)
   check_net(net)
   terms <- get_terms_from_formula(form, net)
-    
+ 
+  if (verbose > 0) { 
+    cat("\nBeginning estimation procedure for:")
+    cat(paste0("\n       ", terms))
+  }  
+
   # Since net_list was not provided, we need to make it 
   memb_list <- check_and_convert_memb(node_memb)
     memb_labels <- memb_list$memb_labels
@@ -183,7 +182,8 @@ mlergm <- function(form,
 
   # Initialize object
   obj <- initialize_object(net_list = net_list,
-                           net = net, 
+                           net = net,
+                           terms = terms,  
                            block_memb = memb_internal, 
                            theta_init = theta_init,
                            param_list = param_list, 

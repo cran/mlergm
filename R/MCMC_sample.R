@@ -49,7 +49,7 @@ MCMC_sample <- function(obj) {
         cur_theta[obj$net$mutual_loc] <- cur_theta[obj$net$mutual_loc] + log_fun(obj$est$sizes[i])
       }
     }
-    form <- as.formula(paste("cur_net ~ ", paste(deparse(obj$net$model$formula[[3]]), collapse = "")))
+    form <- as.formula(paste0("cur_net ~ ", obj$net$terms))
     
     # Simulate sufficient statistics
     cur_sim_stat <- simulate(form,
@@ -269,7 +269,7 @@ par_sim_fun <- function(i, obj, split_ind) {
 
     stat_matrix <- matrix(0, nrow = obj$sim$num_obs,
                              ncol = obj$net$num_terms)
-    form <- as.formula(paste("cur_net ~ ", paste(deparse(obj$net$model$formula[[3]]), collapse = "")))
+    form <- as.formula(paste("cur_net ~ ", obj$net$terms)) 
   
     if (obj$net$na_flag) {
       cond_matrix <- stat_matrix

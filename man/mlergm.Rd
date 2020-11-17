@@ -139,7 +139,7 @@ R package version 2.4. \url{https://CRAN.R-project.org/package=sna}.
 
 Butts, C. (2008).
 network: a Package for Managing Relational Data in R.
-Journal of Statistical Software, 24(2). \url{http://www.jstatsoft.org/v24/i02/paper}.
+Journal of Statistical Software, 24(2). 
 
 Stewart, J., Schweinberger, M., Bojanowski, M., and M. Morris (2019). 
 Multilevel network data facilitate statistical inference for curved {ERGM}s with geometrically weighted terms. 
