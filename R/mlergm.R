@@ -88,7 +88,7 @@
 #' @seealso \code{\link{gof.mlergm}}, \code{\link{mlnet}}
 #' @keywords estimation
 #' @export 
-#' @importFrom stats median sd as.formula update simulate update.formula pnorm quantile  
+#' @importFrom stats median sd as.formula update simulate update.formula pnorm quantile coef  
 #' @importFrom parallel stopCluster mclapply makeCluster clusterEvalQ clusterApply parLapply 
 #' @importFrom Matrix bdiag
 #' @importFrom stringr str_match str_split str_trim str_replace_all 
@@ -183,6 +183,7 @@ mlergm <- function(form,
   # Initialize object
   obj <- initialize_object(net_list = net_list,
                            net = net,
+                           form = form, 
                            terms = terms,  
                            block_memb = memb_internal, 
                            theta_init = theta_init,
@@ -203,15 +204,7 @@ mlergm <- function(form,
     if (verbose > 0) { 
       cat("\n\nComputing initial estimate.")  
     }
-
-    if (!is.curved(obj$net$model)) { 
-      obj$est$theta <- numeric(length(obj$net$model$coef.names))
-      obj <- compute_initial_estimate(obj)
-    } else {
-      obj$est$theta <- numeric(length(obj$net$model$coef.names)) 
-      obj <- compute_initial_estimate(obj)
-    }
-    
+    obj <- compute_initial_estimate(obj)
     if (verbose > 0) {
       cat("\n    Initial estimate:")
       cat(paste("\n     ", obj$net$theta_names, " = ", formatC(obj$est$theta, digits = 4, format = "f")))

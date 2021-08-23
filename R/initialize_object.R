@@ -1,6 +1,7 @@
 
 initialize_object <- function(net_list,
                               net, 
+                              form, 
                               terms, 
                               block_memb,
                               param_list,
@@ -35,6 +36,7 @@ initialize_object <- function(net_list,
                   mutual_loc = param_list$mutual_loc,
                   etamap = param_list$eta_map,
                   theta_names = NULL)
+  obj$net$model$formula <- form 
 
   # Fill in the number of nodes in each cluster
   for (i in 1:obj$net$num_clust) {

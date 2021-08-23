@@ -1152,5 +1152,9 @@ check_formula <- function(form) {
 
 
 
+is.formula <- function(form) { 
+  res <- "formula" %in% is(form)
+  return(res)
+}
 
 

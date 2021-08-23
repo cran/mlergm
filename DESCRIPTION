@@ -1,6 +1,6 @@
 Package: mlergm
 Title: Multilevel Exponential-Family Random Graph Models
-Version: 0.7
+Version: 0.8
 Authors@R: c(
            person("Jonathan", "Stewart", email = "jrstewart@fsu.edu", role = c("cre", "aut")),
            person("Michael", "Schweinberger", email = "michael.schweinberger@rice.edu", role = c("ctb")))
@@ -13,11 +13,11 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
-VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2020-11-16 14:54:37 UTC; jstew
+VignetteBuilder: knitr
+Packaged: 2021-08-23 10:49:59 UTC; jstew
 Author: Jonathan Stewart [cre, aut],
   Michael Schweinberger [ctb]
 Maintainer: Jonathan Stewart <jrstewart@fsu.edu>
 Repository: CRAN
-Date/Publication: 2020-11-17 08:30:05 UTC
+Date/Publication: 2021-08-23 16:00:02 UTC
