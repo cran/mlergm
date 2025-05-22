@@ -2,7 +2,7 @@
 #'
 #' Prints a summary of the estimated \code{mlergm} model.
 #'
-#' @param object An object of class \code{mlergm}, probably produced by \code{\link{mlergm}}.
+#' @param object An object of class \code{mlergm}, probably produced by \code{\link[mlergm]{mlergm}}.
 #' @param \dots Additional arguments to be passed if necessary.  
 #'
 #' @export 

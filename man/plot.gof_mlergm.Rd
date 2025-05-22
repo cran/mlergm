@@ -30,7 +30,7 @@
 )
 }
 \arguments{
-\item{x}{An object of class \code{gof_mlergm}, produced by \code{\link{gof.mlergm}}.}
+\item{x}{An object of class \code{gof_mlergm}, produced by \code{\link[mlergm]{gof.mlergm}}.}
 
 \item{\dots}{Additional argument to be passed if necessary.}
 
@@ -73,8 +73,8 @@
 
 \item{y_axis_size}{The font size of the y acis tick labels. When \code{NULL}, \code{axis_size} is used. Defaults to \code{NULL}.}
 
-\item{pretty_x}{(Logical \code{TRUE} or \code{FALSE}) If set to \code{TRUE}, the \code{link{pretty}} function will be called to format the x-axis breaks. This can be useful for when the x-axis range is large.}
+\item{pretty_x}{(Logical \code{TRUE} or \code{FALSE}) If set to \code{TRUE}, the \code{link[base]{pretty}} function will be called to format the x-axis breaks. This can be useful for when the x-axis range is large.}
 }
 \description{
-Produces goodness-of-fit plots for a \code{gof_mlergm} object in order to visualize and assess the fit of an estimated model produced by \code{\link{mlergm}}.
+Produces goodness-of-fit plots for a \code{gof_mlergm} object in order to visualize and assess the fit of an estimated model produced by \code{\link[mlergm]{mlergm}}.
 }

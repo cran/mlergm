@@ -1,11 +1,11 @@
 #' Multilevel Exponential-Family Random Graph Models
 #'
-#'  This function estimates an exponential-family random graph model for multilevel network data. At present, \code{mlergm} covers network data where the set of nodes is nested within known blocks (see, e.g., Schweinberger and Handcock, 2015). An example is groups of students nested within classrooms, which is covered in the \code{\link{classes}} data set. It is assumed that the node membership, that to which block each node is associated, is known (or has been previously estimated).
+#'  This function estimates an exponential-family random graph model for multilevel network data. At present, \code{mlergm} covers network data where the set of nodes is nested within known blocks (see, e.g., Schweinberger and Handcock, 2015). An example is groups of students nested within classrooms, which is covered in the \code{\link[mlergm]{classes}} data set. It is assumed that the node membership, that to which block each node is associated, is known (or has been previously estimated).
 #'
-#' The estimation procedures performs Monte-Carlo maximum likelihood for the specified ERGM using a version of the Fisher scoring method detailed by Hunter and Handcock (2006). Settings governing the MCMC procedure (such as \code{burnin}, \code{interval}, and \code{sample_size}) as well as more general settings for the estimation procedure can be adjusted through \code{\link{set_options}}. The estimation procedure uses the the stepping algorithm of Hummel, et al., (2012) for added stability. 
+#' The estimation procedures performs Monte-Carlo maximum likelihood for the specified ERGM using a version of the Fisher scoring method detailed by Hunter and Handcock (2006). Settings governing the MCMC procedure (such as \code{burnin}, \code{interval}, and \code{sample_size}) as well as more general settings for the estimation procedure can be adjusted through \code{\link[mlergm]{set_options}}. The estimation procedure uses the the stepping algorithm of Hummel, et al., (2012) for added stability. 
 #'
 #' @param form Formula of the form:  \code{network ~ term1 + term2 + ...}; allowable model terms are a subset of those in R package ergm,
-#' see \code{\link{ergm.terms}}.  
+#' see \code{\link[ergm]{ergm.terms}}.  
 #' @param node_memb Vector (length equal to the number of nodes in the network) indicating to which  block or group the nodes belong.  
 #' If the network provided in \code{form} is an object of class \code{mlnet}, 
 #' then \code{node_memb} can be exctracted directly from the network and need not be provided. 
@@ -15,16 +15,17 @@
 #' \item 'offset' : The offset parameterization uses edge and mutual offsets along the lines of Krivitsky, Handcock, and Morris (2011) and Krivitsky and Kolaczyk (2015). The edge parameter is offset by \eqn{-log n(k)} and the mutual parameter is offset by \eqn{+log n(k)}, where \eqn{n(k)} is the size of the kth block.  
 #' \item 'size' : Multiplies the block parameters by \eqn{log n(k)}, where \eqn{n(k)} is the size of the kth block.
 #' }
-#' @param options See \code{\link{set_options}} for details. 
+#' @param options See \code{\link[mlergm]{set_options}} for details. 
 #' @param theta_init Parameter vector of initial estimates for theta to be used. 
 #' @param verbose Controls the level of output. A value of \code{0} corresponds to no output, except for warnings; a value of \code{1} corresponds to minimal output, and a value of \code{2} corresponds to full output. 
 #' @param eval_loglik (Logical \code{TRUE} or \code{FALSE}) If set to \code{TRUE}, the bridge estimation procedure of Hunter and Handcock (2006) is used to estimate the loglikelihood for BIC calculations, otherwise the loglikelihood and therefore the BIC is not estimated.   
 #' @param seed For reproducibility, an integer-valued seed may be specified.
 #' @return 
-#' \code{\link{mlergm}} returns an object of class \code{\link{mlergm}} which is a list containing:
+#' \code{\link[mlergm]{mlergm}} returns an object of class \code{\link[mlergm]{mlergm}} which is a list containing:
 #' \item{theta}{Estimated parameter vector of the exponential-family random graph model.}
 #' \item{between_theta}{Estimated parameter vector of the between group model.}
 #' \item{se}{Standard error vector for theta.}
+#' \item{vcovmat}{Variance-covariance matrix of the sufficient statistics of the model. Also the Fisher Information matrix.}
 #' \item{between_se}{Standard error vector for between_theta.}
 #' \item{pvalue}{A vector of p-values for the estimated parameter vector.}
 #' \item{between_pvalue}{A vector of p-values for the estimated parameter vector.}
@@ -33,6 +34,7 @@
 #' \item{mcmc_chain}{The MCMC sample used in the final estimation step, which can be used to diagnose non-convergence.}
 #' \item{estimation_status}{Indicator of whether the estimation procedure had \code{succcess} or \code{failed}.}
 #' \item{parameterization}{The model parameterization (either \code{standard} or \code{offset}).}
+#' \item{etamap}{Object defining the evaluation of the canonical parameters. See \code{\link[mlergm]{eta}} for more details.}
 #' \item{formula}{The model formula.}
 #' \item{network}{The network for which the model is estimated.}
 #' \item{node_memb}{Vector indicating to which group or block the nodes belong.}
@@ -85,10 +87,10 @@
 #' Exponential-family models of random graphs: Inference in finite-, super-, and infinite-population scenarios. 
 #' https://arxiv.org/abs/1707.04800
 #'
-#' @seealso \code{\link{gof.mlergm}}, \code{\link{mlnet}}
+#' @seealso \code{\link[mlergm]{gof.mlergm}}, \code{\link[mlergm]{mlnet}}
 #' @keywords estimation
 #' @export 
-#' @importFrom stats median sd as.formula update simulate update.formula pnorm quantile coef  
+#' @importFrom stats median sd as.formula update simulate update.formula pnorm quantile coef vcov
 #' @importFrom parallel stopCluster mclapply makeCluster clusterEvalQ clusterApply parLapply 
 #' @importFrom Matrix bdiag
 #' @importFrom stringr str_match str_split str_trim str_replace_all 
@@ -97,6 +99,7 @@
 #' @importFrom plyr is.formula 
 #' @importFrom methods is
 #' @importFrom graphics plot 
+#' @importFrom statnet.common list_rhs.formula
 #' @import ergm 
 #' @import network
 #' @examples 
@@ -105,7 +108,7 @@
 #' data(classes) 
 #'
 #' # Estimate a curved multilevel ergm model with offset parameter 
-#' # Approximate run time (2 cores): 1.2m, Run time (3 cores): 55s 
+#' # Approximate run time (2 cores): 1.29m, Run time (5 cores): 1.01m
 #' model_est <- mlergm(classes ~ edges + mutual + nodematch("sex") +  gwesp(fixed = FALSE), 
 #'                     seed = 123, 
 #'                     options = set_options(number_cores = 2))
@@ -114,9 +117,16 @@
 #' summary(model_est)
 #'
 #' # Goodness-of-fit can be run by calling the 'gof.mlergm' method 
-#' # Approximate run time (2 cores): 48s, Run time (3 cores): 34s  
+#' # Approximate run time (2 cores): 32.7s, Run time (5 cores): 18.4s  
 #' gof_res <- gof(model_est, options = set_options(number_cores = 2))
 #' plot(gof_res, cutoff = 15)
+#'
+#' # Additional information can be obtained by setting verbose = 1,2. 
+#' # Approximate run time (2 cores): 6.7s, Run time (5 cores): 5.6s 
+#' model_est <- mlergm(classes ~ edges + mutual + nodematch("sex"), 
+#'                     seed = 123, 
+#'                     verbose = 2, 
+#'                     options = set_options(number_cores = 2))
 #' } 
 mlergm <- function(form,
                    node_memb,
@@ -172,7 +182,6 @@ mlergm <- function(form,
     memb_internal <- memb_list$memb_internal 
     rm(memb_list); clean_mem()
   net_list <- make_net_list(net, memb_internal) 
-  
 
   # Determine the parameterization type and compute necessary quantities
   model_temp <- ergm_model(form, net)
@@ -261,12 +270,15 @@ mlergm <- function(form,
       mcmc_path <- Reduce("+", obj$sim$stats)
       colnames(mcmc_path) <- statistic_names
       obj$est$theta <- as.numeric(obj$est$theta)
-      names(obj$est$theta) <- get_coef_names(obj$net$model, FALSE)
+      names(obj$est$theta) <- get_coef_names(obj$net$model)
       names(obj$se) <- names(obj$est$theta)
+      rownames(obj$est$info_mat) <- names(obj$est$theta)
+      colnames(obj$est$info_mat) <- names(obj$est$theta)
       names(obj$pvalue) <- names(obj$est$theta)
       estimates <- list(theta = obj$est$theta,
                         between_theta = obj$est$between_theta, 
                         between_se = obj$est$between_se,
+                        information_matrix = obj$est$info_mat, 
                         se = obj$se,
                         pvalue = obj$pvalue, 
                         between_pvalue = obj$est$between_pvalue,  
@@ -275,6 +287,7 @@ mlergm <- function(form,
                         mcmc_chain = mcmc_path,
                         estimation_status = "success",
                         parameterization = obj$est$parameterization,
+                        etamap = obj$net$etamap, 
                         formula = form,
                         network = net,
                         node_memb = node_memb,

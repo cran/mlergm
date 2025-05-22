@@ -13,8 +13,8 @@ is.gof_mlergm(x)
 \code{TRUE} if the provided object \code{x} is of class \code{gof_mlergm}, \code{FALSE} otherwise.
 }
 \description{
-Function checks if a provided object is of class \code{gof_mlergm} (see \code{\link{gof.mlergm}} for details).
+Function checks if a provided object is of class \code{gof_mlergm} (see \code{\link[mlergm]{gof.mlergm}} for details).
 }
 \seealso{
-\code{\link{mlergm}}, \code{\link{gof.mlergm}}
+\code{\link[mlergm]{mlergm}}, \code{\link[mlergm]{gof.mlergm}}
 }

@@ -3,7 +3,7 @@ bridge_fun <- function(net, form, theta, offset, burnin, interval, num_bridges, 
   form <- as.formula(paste0("net ~ ", as.character(form)[3]))
   model <- ergm_model(form, net)
   etamap <- model$etamap
-  coef_names <- get_coef_names(model, !is.curved(model))
+  coef_names <- get_coef_names(model)
   if (offset == TRUE) { 
     if ("edges" %in% coef_names) {
         edge_loc <- which(coef_names == "edges")
@@ -37,7 +37,7 @@ bridge_fun <- function(net, form, theta, offset, burnin, interval, num_bridges, 
                                   control = control.ergm.bridge(MCMC.samplesize = sample_size, 
                                                                 MCMC.interval = interval,
                                                                 MCMC.burnin = burnin, 
-                                                                nsteps = num_bridges)))
+                                                                bridge.nsteps = num_bridges))) 
 
   return(bridge_val) 
 }
@@ -97,37 +97,6 @@ lik_fun <- function(form, memb, theta, bridge_num = 10, ncores = 3, offset = FAL
   
   return(lik_val)
 }
-
-
-get_coef_names <- function(model_obj, is_canonical) { 
-  if(is_canonical) {
-    model_obj$coef.names
-  } else { 
-    unlist(lapply(model_obj$terms,
-                  function(term) {
-                    find_first_non_null(names(term$params),  term$coef.names)
-                  }))
-  }
-}
-
-
-find_first_non_null <- function(...) { 
-  for (x in list(...)) {
-    if (!is.null(x)) {
-      break
-    }
-  }
-  x
-}
-
-
-
-
-
-
-
-
-
 
 
 

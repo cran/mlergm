@@ -339,7 +339,7 @@ check_parameterization_type <- function(net_list, terms, parameterization, model
   }
 
   if (parameterization %in% c("offset")) {
-    param_names <- get_coef_names(model, !is.curved(model))
+    param_names <- get_coef_names(model)
     edge_ind <- which(param_names == "edges")
     mutual_ind <- which(param_names == "mutual")
     edge_loc <- ifelse(length(edge_ind) > 0, edge_ind, 0)
@@ -370,15 +370,8 @@ check_parameterization_type <- function(net_list, terms, parameterization, model
 
 
 
-get_coef_names <- function(model_obj, is_canonical) {
-  if(is_canonical) {
-    model_obj$coef.names
-  } else {
-    unlist(lapply(model_obj$terms,
-                  function(term) {
-                    find_first_non_null(names(term$params),  term$coef.names)
-                  }))
-  }
+get_coef_names <- function(model_obj) {
+  param_names(model_obj) 
 }
 
 
@@ -1071,9 +1064,8 @@ histplot_fun <- function(dat_mat, line_dat = NULL,
 
 check_terms <- function(form, K) { 
   check_formula(form) 
-  all_vars <- all.vars(form, functions = TRUE)
-  all_vars <- all_vars[!(all_vars %in% c("-", "+", "~", ":"))]
-  all_vars <- all_vars[-1]
+  terms_ <- list_rhs.formula(form)
+  all_vars <- sapply(terms_, function(x) { as.character(x)[1] } )
 
   allowable_terms <- c("edges",
                        "mutual",

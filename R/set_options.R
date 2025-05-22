@@ -34,8 +34,8 @@
 #'
 #' @export
 #' @importFrom parallel detectCores
-set_options <- function(burnin = 1e+4,
-                        interval = 1000,
+set_options <- function(burnin = 1e+5,
+                        interval = 2000,
                         sample_size = 1000,
                         NR_tol = 1e-4,
                         NR_max_iter = 50,

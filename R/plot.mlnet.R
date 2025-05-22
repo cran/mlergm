@@ -2,7 +2,7 @@
 #'
 #' Plots network objects of type \code{mlnet}. 
 #'
-#' @param x An object of class \code{mlnet}, possibly produced by \code{\link{mlnet}} or \code{\link{simulate_mlnet}}. 
+#' @param x An object of class \code{mlnet}, possibly produced by \code{\link[mlergm]{mlnet}} or \code{\link[mlergm]{simulate_mlnet}}. 
 #' @param node_size Controls the size of nodes. 
 #' @param memb_colors Specifies the named colors to be used for the membership colors.  
 #' @param palette If package \code{RColorBrewer} is installed, then the name of an R color brewer pallete can be specified and used for the block colors. See \code{brewer.pal} for details on RColorBrewer palletes. 
@@ -12,7 +12,7 @@
 #' @param legend.position The position of the legend in the plot. Defaults to the "right" position. 
 #' @param color_legend_title Name for the node color legend title. 
 #' @param layout_type Viable layout options. See \code{gplot.layout} for options. 
-#' @param \dots Additional arguments to be passed to \code{\link{ggnet2}}.
+#' @param \dots Additional arguments to be passed to \code{\link[GGally]{ggnet2}}.
 #'
 #' @export 
 #' @importFrom GGally ggnet2

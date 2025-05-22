@@ -7,18 +7,18 @@
 \method{gof}{mlergm}(object, ..., options = set_options(), seed = NULL, gof_form = NULL)
 }
 \arguments{
-\item{object}{An object of class \code{\link{mlergm}}, likely produced by function \code{\link{mlergm}}.}
+\item{object}{An object of class \code{\link[mlergm]{mlergm}}, likely produced by function \code{\link{mlergm}}.}
 
 \item{\dots}{Additional arguments to be passed if necessary.}
 
-\item{options}{See \code{\link{set_options}} for details.}
+\item{options}{See \code{\link[mlergm]{set_options}} for details.}
 
 \item{seed}{A seed to be provided to ensure reproducibility of results.}
 
 \item{gof_form}{A formula object of the form \code{~ term1 + term2 + ...} for statistics to compute for the GOF procedure.}
 }
 \value{
-\code{\link{gof.mlergm}} returns an object of class \code{gof_mlergm} which is a list containing:
+\code{\link[mlergm]{gof.mlergm}} returns an object of class \code{gof_mlergm} which is a list containing:
 \item{obs_stats}{The GOF statistic values of the observed network.}
 \item{gof_stats}{The GOF statistic values simulated from the the estimated \code{mlergm} objeect provided.}
 }
@@ -34,6 +34,6 @@ Goodness of fit of social network models.
 Journal of the American Statistical Association, 103(481), 248-258.
 }
 \seealso{
-\code{\link{plot.gof_mlergm}}
+\code{\link[mlergm]{plot.gof_mlergm}}
 }
 \keyword{estimation}

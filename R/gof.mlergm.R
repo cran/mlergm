@@ -5,14 +5,14 @@
 #' from an fitted \code{mlergm} object, which can then be plotted and visualized.  
 #' An example is given in the documentation of \code{\link{mlergm}}.
 #'
-#' @param object An object of class \code{\link{mlergm}}, likely produced by function \code{\link{mlergm}}.  
+#' @param object An object of class \code{\link[mlergm]{mlergm}}, likely produced by function \code{\link{mlergm}}.  
 #' @param \dots Additional arguments to be passed if necessary. 
-#' @param options See \code{\link{set_options}} for details.   
+#' @param options See \code{\link[mlergm]{set_options}} for details.   
 #' @param seed A seed to be provided to ensure reproducibility of results. 
 #' @param gof_form A formula object of the form \code{~ term1 + term2 + ...} for statistics to compute for the GOF procedure. 
 #' @name gof.mlergm 
 #' @return 
-#' \code{\link{gof.mlergm}} returns an object of class \code{gof_mlergm} which is a list containing:
+#' \code{\link[mlergm]{gof.mlergm}} returns an object of class \code{gof_mlergm} which is a list containing:
 #' \item{obs_stats}{The GOF statistic values of the observed network.}
 #' \item{gof_stats}{The GOF statistic values simulated from the the estimated \code{mlergm} objeect provided.}
 #' 
@@ -22,7 +22,7 @@
 #' Goodness of fit of social network models. 
 #' Journal of the American Statistical Association, 103(481), 248-258.
 #'
-#' @seealso \code{\link{plot.gof_mlergm}}
+#' @seealso \code{\link[mlergm]{plot.gof_mlergm}}
 #' @keywords estimation 
 #' @export 
 gof.mlergm <- function(object, ..., options = set_options(), seed = NULL, gof_form = NULL) { 

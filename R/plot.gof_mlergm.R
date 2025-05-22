@@ -1,8 +1,8 @@
 #' Plot goodness-of-fit results
 #' 
-#' Produces goodness-of-fit plots for a \code{gof_mlergm} object in order to visualize and assess the fit of an estimated model produced by \code{\link{mlergm}}. 
+#' Produces goodness-of-fit plots for a \code{gof_mlergm} object in order to visualize and assess the fit of an estimated model produced by \code{\link[mlergm]{mlergm}}. 
 #'
-#' @param x An object of class \code{gof_mlergm}, produced by \code{\link{gof.mlergm}}. 
+#' @param x An object of class \code{gof_mlergm}, produced by \code{\link[mlergm]{gof.mlergm}}. 
 #' @param \dots Additional argument to be passed if necessary. 
 #' @param individual_plots (Logical \code{TRUE} or \code{FALSE}) If \code{TRUE}, individual gof plots are produced. Defaults to 
 #' \code{FALSE}.  
@@ -24,7 +24,7 @@
 #' @param y_axis_label_size The font size of the y axis label. When \code{NULL}, \code{axis_label_size} is used. Defaults to \code{NULL}. 
 #' @param x_axis_size The font size of the x axis tick labels. When \code{NULL}, \code{axis_size} is used. Defaults to \code{NULL}. 
 #' @param y_axis_size The font size of the y acis tick labels. When \code{NULL}, \code{axis_size} is used. Defaults to \code{NULL}.
-#' @param pretty_x (Logical \code{TRUE} or \code{FALSE}) If set to \code{TRUE}, the \code{link{pretty}} function will be called to format the x-axis breaks. This can be useful for when the x-axis range is large.  
+#' @param pretty_x (Logical \code{TRUE} or \code{FALSE}) If set to \code{TRUE}, the \code{link[base]{pretty}} function will be called to format the x-axis breaks. This can be useful for when the x-axis range is large.  
 #'
 #' @export
 #' @import ggplot2

@@ -17,7 +17,7 @@ simulate_mlnet(
 )
 }
 \arguments{
-\item{form}{A \code{\link{formula}} object of the form \code{network ~ model terms} which specifies how the within-block subgraphs are modeled.}
+\item{form}{A \code{\link[stats]{formula}} object of the form \code{network ~ model terms} which specifies how the within-block subgraphs are modeled.}
 
 \item{node_memb}{Vector of node block memberships.}
 
@@ -32,22 +32,22 @@ simulate_mlnet(
 
 \item{seed}{Seed to be provided for reproducibility.}
 
-\item{between_form}{A \code{\link{formula}} object of the form \code{~ model terms} which specifies how the within-block subgraphs are modeled.}
+\item{between_form}{A \code{\link[stats]{formula}} object of the form \code{~ model terms} which specifies how the within-block subgraphs are modeled.}
 
 \item{between_theta}{A vector of model parameters (coefficients) for the ERGM governing the between-subgraph edges.}
 
 \item{between_prob}{A probability which specifies how edges between blocks are governerd. An ERGM (\code{between_form} and \code{between_theta}) cannot be specified together with \code{between_prob}.}
 
-\item{options}{Use \code{\link{set_options}} to change the simulation options. Note that some options are only valid for estimation using \code{\link{mlergm}}.}
+\item{options}{Use \code{\link[mlergm]{set_options}} to change the simulation options. Note that some options are only valid for estimation using \code{\link[mlergm]{mlergm}}.}
 }
 \value{
-\code{simulate_mlnet} returns an objects of class \code{\link{mlnet}}.
+\code{simulate_mlnet} returns an objects of class \code{\link[mlergm]{mlnet}}.
 }
 \description{
 Function simulates a multilevel network by specifying a network size, node block memberships, and within-block and between-block models. The function currently only suppports block-models where between-block edges are dyad-independent.
 }
 \details{
-Simulation of multilevel block networks is done with a Monte-Carlo Markov chain (MCMC) and can be done in parallel where \code{\link{set_options}} can be used to adjust the simulation settings (such as \code{burnin}, \code{interval}, and \code{sample_size}). Each within-block subgraph is given its own Markov chain, and so these settings are the settings to be used for each within-block chain.
+Simulation of multilevel block networks is done with a Monte-Carlo Markov chain (MCMC) and can be done in parallel where \code{\link[mlergm]{set_options}} can be used to adjust the simulation settings (such as \code{burnin}, \code{interval}, and \code{sample_size}). Each within-block subgraph is given its own Markov chain, and so these settings are the settings to be used for each within-block chain.
 }
 \examples{
 \donttest{

@@ -23,8 +23,10 @@ opt_fisher <- function(obj) {
       cat("\n    Computing step.")
     }
     weights  <- comp_weights(obj)
-    if (weights == "broken") { 
-      obj$est$ML_status_fail <- TRUE
+    if (is.character(weights)) { 
+      if (weights == "broken") { 
+        obj$est$ML_status_fail <- TRUE
+      }
     }
 
     # Compute information matrix

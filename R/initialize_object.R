@@ -61,7 +61,7 @@ initialize_object <- function(net_list,
   }
 
   # Set the theta_names for printing 
-  theta_names <- get_coef_names(obj$net$model, !is.curved(obj$net$model$formula))
+  theta_names <- get_coef_names(obj$net$model) 
   num_chars <- nchar(theta_names)
   max_char <- max(num_chars)
   for (i in 1:length(theta_names)) { 

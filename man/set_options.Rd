@@ -5,8 +5,8 @@
 \title{Set and adjust options and settings.}
 \usage{
 set_options(
-  burnin = 10000,
-  interval = 1000,
+  burnin = 1e+05,
+  interval = 2000,
   sample_size = 1000,
   NR_tol = 1e-04,
   NR_max_iter = 50,

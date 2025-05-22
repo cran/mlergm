@@ -13,8 +13,8 @@ is.mlnet(x)
 \code{TRUE} if the provided object \code{x} is of class \code{mlnet}, \code{FALSE} otherwise.
 }
 \description{
-Function checks if a provided object is of class \code{mlnet} (see \code{\link{mlnet}} for details).
+Function checks if a provided object is of class \code{mlnet} (see \code{\link[mlergm]{mlnet}} for details).
 }
 \seealso{
-\code{\link{mlnet}}
+\code{\link[mlergm]{mlnet}}
 }
